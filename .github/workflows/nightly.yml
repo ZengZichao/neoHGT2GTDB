@@ -1,0 +1,157 @@
+name: Nightly benchmarks
+
+# Non-blocking resource report (plan §10.6): the full R232 build costs more
+# than 8 h, so it is not a pull-request gate. These jobs measure the tiers that
+# can run in CI and record wall clock, peak RSS and disk for each artifact.
+# Nothing here is allowed to write outside the runner workspace.
+
+on:
+  schedule:
+    - cron: '43 4 * * *'
+  workflow_dispatch:
+
+env:
+  NEOHGT_ROOT: ${{ github.workspace }}
+  PYTHONDONTWRITEBYTECODE: 1
+
+jobs:
+  tiers:
+    runs-on: ubuntu-latest
+    continue-on-error: true          # a benchmark report, not a gate
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: neohgt
+          python-version: '3.11'
+          channels: conda-forge,bioconda,defaults
+          auto-activate-base: false
+
+      - name: Install dependencies
+        shell: bash -el {0}
+        run: |
+          conda install -y -c bioconda diamond
+          conda install -y -c conda-forge numpy scipy pandas scikit-learn \
+            matplotlib-base pyyaml
+          python -m pip install --no-deps -e .
+          python -m pip install pytest
+
+      - name: Taxonomy conversion (IT-1 equivalent)
+        shell: bash -el {0}
+        run: |
+          mkdir -p reports
+          /usr/bin/time -v python -m neoHGT.gtdb taxdump \
+            --dir "$GTDB_DIR" --out bench_taxdump \
+            2> reports/taxdump.time || true
+          grep -E 'Maximum resident|Elapsed' reports/taxdump.time || true
+        env:
+          GTDB_DIR: ${{ vars.GTDB_DIR }}
+
+      - name: Fastest tier build (IT-2b equivalent)
+        shell: bash -el {0}
+        run: |
+          mkdir -p reports
+          if [ -z "${GTDB_DIR:-}" ]; then
+            echo "GTDB_DIR not set; skipping the build tier"
+            exit 0
+          fi
+          /usr/bin/time -v neoHGT database --source gtdb \
+            --gtdb-dir "$GTDB_DIR" --rank-sample family --domain archaea \
+            --seq-source local --compile diamond --threads "$(nproc)" \
+            -o bench_ar_family 2> reports/it2b.time || true
+          grep -E 'Maximum resident|Elapsed' reports/it2b.time || true
+          du -sh bench_ar_family | tee -a reports/it2b.time
+        env:
+          GTDB_DIR: ${{ vars.GTDB_DIR }}
+
+      - name: Memory slope of the NCBI extraction (P7-5)
+        shell: bash -el {0}
+        run: |
+          mkdir -p reports
+          tax=bench_ar_family/taxdump
+          if [ ! -d "$tax" ]; then
+            tax=bench_taxdump/taxdump
+          fi
+          if [ ! -d "$tax" ]; then
+            echo "no taxdump artifact available; skipping the memory benchmark"
+            exit 0
+          fi
+          for n in 200x1000 1000x1000; do
+            /usr/bin/time -v python tools/bench_stream_extraction.py \
+              --faa-dir neoHGT/tests/data/GTDB/protein \
+              --taxdump "$tax" --synthetic "$n" \
+              --out "reports/stream_${n}.txt" || true
+          done
+          cat reports/stream_*.txt || true
+
+      - name: Dataset consistency audit (DoD-2 mismatch lists)
+        shell: bash -el {0}
+        env:
+          GTDB_DIR: ${{ vars.GTDB_DIR }}
+        run: |
+          mkdir -p reports
+          if [ -z "${GTDB_DIR:-}" ] || [ ! -d "$GTDB_DIR" ]; then
+            echo "GTDB_DIR not provided; skipping the consistency audit"
+            exit 0
+          fi
+          # Uses the CLI entry point (delegates to neoHGT.gtdb.main). Non-zero
+          # means the accession-level sets differ, i.e. the local copy drifted.
+          rc=0
+          /usr/bin/time -v neoHGT gtdb reconcile --dir "$GTDB_DIR" \
+            --out reports/reconcile --report reports/reconcile.json \
+            2> reports/reconcile.time || rc=$?
+          grep -E 'Maximum resident|Elapsed' reports/reconcile.time || true
+          if [ "$rc" -ne 0 ]; then
+            echo "ERROR: the GTDB copy is inconsistent; non-empty lists:"
+            for f in reports/reconcile/*.tsv; do
+              n=$(grep -cEv '^(#|accession$)' "$f" || true)
+              [ "$n" -gt 0 ] && echo "  $f ($n accessions)"
+            done
+          fi
+          exit $rc
+
+      - name: Read-only guard for the input dataset
+        shell: bash -el {0}
+        env:
+          GTDB_DIR: ${{ vars.GTDB_DIR }}
+        run: |
+          if [ -z "${GTDB_DIR:-}" ] || [ ! -d "$GTDB_DIR" ]; then
+            echo "GTDB_DIR not provided; nothing to check"
+            exit 0
+          fi
+          # One implementation, not a second weaker copy: the same checker the
+          # round gates run. It counts entries and reports what changed rather
+          # than stopping at the first hit.
+          python tools/verify_read_only.py --dir "$GTDB_DIR" \
+            --since "$(date -u -d '-2 hours' +'%Y-%m-%d %H:%M:%S')" \
+            --out reports/nightly_read_only.txt
+
+      - name: Register gate against the live plan
+        shell: bash -el {0}
+        env:
+          PLAN_PATH: ${{ vars.PLAN_PATH }}
+        run: |
+          # The pull-request job already gates the seven registers, but only
+          # against the frozen plan-id digest -- the plan file itself is not in
+          # this repository, so two things go unchecked there: the citations that
+          # only the plan can settle, and the plan's OWN command examples. This
+          # step runs the same gate with --plan when the runner has the file.
+          # Without PLAN_PATH the tool reports `not checked (no --plan)` and this
+          # step says so out loud -- an unjudged plan must not read as a clean one.
+          if [ -z "${PLAN_PATH:-}" ] || [ ! -f "${PLAN_PATH:-}" ]; then
+            echo "NOTE: PLAN_PATH not provided; the plan's own examples are NOT checked"
+          fi
+          python tools/verify_plan_traceability.py --code . \
+            ${PLAN_PATH:+--plan "$PLAN_PATH"} \
+            --out reports/nightly_plan_traceability.json | tee nightly_gate.log
+          grep -q '0 problem(s) -> PASS' nightly_gate.log || {
+            echo "ERROR: register gate did not pass"; exit 1; }
+          test -n "${PLAN_PATH:-}" || echo "plan example values: not checked"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nightly-benchmarks
+          path: reports/
+          if-no-files-found: ignore

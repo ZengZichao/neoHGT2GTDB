@@ -1,0 +1,23 @@
+{
+  "fixture": true,
+  "gtdb_dir": "GTDB_r220",
+  "local_layout": "gtdb-r220-renamed",
+  "n_genomes": 6,
+  "n_proteins": 30,
+  "note": "KB-scale test fixture, not a searchable reference database (plan \u00a710.1)",
+  "release": "220",
+  "source": "gtdb",
+  "taxonomy": {
+    "by_rank": {
+      "class": 4,
+      "domain": 2,
+      "family": 5,
+      "genus": 6,
+      "order": 4,
+      "phylum": 4,
+      "species": 6
+    },
+    "id_base": 100000000,
+    "n_nodes": 32
+  }
+}

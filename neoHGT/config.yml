@@ -1,0 +1,351 @@
+--- # neoHGT 2.0 configuration file
+
+# This file defines the default values of some command-line arguments.
+
+# The program will sequentially look for "config.yml" in the following
+# locations:
+# 1. current directory
+# 2. home directory, under subdirectory ".neoHGT"
+# 3. program directory
+
+## Workspace layout (GTDB adaptation; plan §5.8)
+# All three directories must live inside one project root. neoHGT refuses to
+# write anywhere else, and never writes into the GTDB input dataset.
+#
+# The shipped file deliberately carries NO machine paths: baked-in absolute
+# paths made every machine except the build author's fail on its first write
+# (and made the "workspace" a permission whitelist instead of a safety rule). Set the
+# environment variables instead -- tools/env.sh is the reference setup:
+#   NEOHGT_ROOT   workspace root that outputs must stay inside
+#   NEOHGT_TMP    scratch directory (defaults under NEOHGT_ROOT)
+#   NEOHGT_CACHE  cache/reports directory (defaults under NEOHGT_ROOT)
+# or override per run with --workspace-out / --workspace-tmp. With nothing set,
+# writes are not contained to a workspace (a NOTE says so once); the read-only
+# input dataset is never written to in either case.
+workspace:
+  code_dir:
+  tmp_dir:
+  cache_dir:
+
+## Database locations
+database:
+  # data source used when the `database` stage is started without --source:
+  # ncbi (unchanged behavior), gtdb or hybrid. The search and analyze stages do
+  # not read this key: their own --source defaults to "auto", which detects the
+  # source from the reference database in front of them.
+  source: ncbi
+
+  # hybrid mode: a local GTDB copy ships no NCBI taxonomy, so a hybrid build
+  # needs an NCBI-style nodes.dmp/names.dmp directory of its own (plan §3.4).
+  # Empty means unset; the code falls back to --hybrid-ncbi-taxdump and a
+  # `--source hybrid` run refuses until one of the two names a directory.
+  hybrid:
+    ncbi_taxdump:
+
+  # GTDB data source settings (used when source is gtdb or hybrid)
+  gtdb:
+    # read-only local GTDB dataset root; empty means "take $GTDB_DIR, else
+    # require --gtdb-dir". The shipped default used to be one machine's mount
+    # point, which other installs could not have.
+    dir:
+    # release label; inferred from file names when "auto"
+    release: auto
+    # auto | local-renamed | official-plain | official-gz
+    # ("gtdb-r220-renamed" is accepted as an alias of "local-renamed")
+    local_layout: auto
+    # local | ncbi | gtdb-tar | ena (remote channels need --allow-network yes)
+    seq_source: local
+    # first taxId of the reserved GTDB range; must not clash with NCBI taxIds
+    # (spike S1: db.dmnd grows with the highest taxId value, so 1e8 is ~9x
+    # smaller than 1e9 while still far above any real NCBI taxId)
+    taxid_base: 100000000
+    # run the input self-consistency checks and abort if any fails
+    selfcheck: required
+    # record sha256/size/line counts of the inputs (no MD5SUM.txt locally)
+    verify_input_fingerprints: yes
+    # placeholder names are *not* configured here: the filter runs while
+    # searching, so its only knob is taxonomy.profiles.gtdb.keep_placeholder
+    # (see neoHGT/search.py: set_params_gtdb). A key here would be inert.
+    # genome quality filters are deliberately NOT applied from here: passing
+    # them implicitly would make "--reps" genome counts disagree with the
+    # metadata representative totals that DoD-2 verifies. Opt in per build:
+    #   --min-completeness 50 --max-contamination 10
+    # min_completeness: 50
+    # max_contamination: 10
+    # only used by the remote channels; the second host's TLS certificate is
+    # expired, so "auto" must verify the host before use
+    mirror: ecogenomic
+
+  # reference protein sequence database for DIAMOND
+  diamond:
+
+  # reference protein sequence database for BLASTp
+  blast:
+
+  # directory of taxonomy database files (NCBI-style nodes.dmp and names.dmp)
+  # if omitted, the program will retrieve information from remote server
+  taxdump:
+
+  # sequence Id to taxId mapping file (e.g., NCBI's prot.accession2taxid)
+  # not necessary if protein database already contains taxonomy information
+  taxmap:
+
+## External program executables
+program:
+  # DIAMOND executable
+  diamond:
+
+  # BLAST executables
+  blastp:
+  blastdbcmd:
+  makeblastdb:
+
+## Remote server URLs
+server:
+  search: https://blast.ncbi.nlm.nih.gov/Blast.cgi
+  selfaln: https://blast.ncbi.nlm.nih.gov/BlastAlign.cgi
+  fetch: https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi
+
+## Sequence homology search
+# each protein sequence will be searched against a reference database
+search:
+  # search method
+  # options: auto, diamond, blast, remote, precomp (pre-computed result)
+  # if auto, priority will be precomp > diamond > blast > remote, if
+  # available
+  method: auto
+
+  # gene (protein) filtering
+  minsize: 30 # minimum size (aa) of a valid protein
+
+  # search cutoffs
+  maxseqs: 500 # maximum number of sequences to return
+  evalue: 1.0e-5 # maximum E-value cutoff (note: keep decimal point)
+  identity: 0 # minimum percent identity cutoff
+  coverage: 0 # minimum percent query coverage cutoff
+
+  # hits filtering
+  maxhits: 0 # maximum number of hits to preserve (0 for unlimited)
+
+  # self-alignment method
+  # options: auto, native, fast, lookup, precomp
+  # - native: use choice of search method (diamond, blast or remote)
+  # - fast: use built-in algorithm to calculate blast bit score
+  # - lookup: search result already contains self-alignment result
+  # - auto: priority is precomp > native > fast, if available
+  selfaln: auto
+
+# local search behavior
+local:
+  threads: 0 # number of threads (0 for all CPU cores)
+  tmpdir: # temporary directory
+
+# DIAMOND search behavior
+diamond:
+  queries: 0 # number of queries per run (0 for whole sample)
+  maxchars: 0 # maximum number of characters per run (0 for unlimited)
+  extrargs: # extra command-line arguments for diamond
+
+## BLAST search behavior
+blast:
+  queries: 100 # number of queries per run
+  maxchars: 100000 # maximum number of characters per run
+  extrargs: # extra command-line arguments for blastp
+
+## Remote search behavior
+remote:
+  # remote search database
+  # options: nr, refseq_select_prot, refseq_protein, swissprot, pdb, etc.
+  db: refseq_select_prot
+
+  # remote search algorithm
+  # options: blastp psiBlast deltaBlast kmerBlastp phiBlast, etc.
+  # recommended: kmerBlastp (a.k.a. Quick BLASTP)
+  algorithm: kmerBlastp
+
+  queries: 0 # number of queries per run
+  maxchars:
+    7000 # maximum number of characters per run (note: a valid URL
+    # typically cannot exceed 8,000 characters)
+  retries: 5 # maximum number of retries per search
+  delay: 60 # seconds between two search requests
+  timeout: 1800 # seconds before program gives up waiting
+
+  # entrez query text
+  entrez: all [filter] NOT(environmental samples[filter] OR metagenomes[orgn]) txid131567[orgn]
+
+  # extra URL arguments for remote search
+  extrargs: "&WORD_SIZE=6&FILTER=m%20S"
+
+## Fetch information from remote server
+fetch:
+  # whether to enable remote fetch
+  # options: auto, yes, no
+  # if auto, only enable when search is remote or taxdump is not provided
+  enable: auto
+
+  # remote query behavior
+  queries: 100 # maximum number of query entries per search
+  retries: 3 # maximum number of retries per search
+  delay: 5 # seconds between two fetch requests
+  timeout: 60 # seconds before program gives up waiting
+
+## Download database files from remote server
+download:
+  retries: 3 # maximum number of retries per file
+  delay: 10 # seconds between retries
+  timeout: 60 # seconds before program gives up waiting
+
+## Taxonomic filtering
+taxonomy:
+  # include taxIds equal to or as children of any of the following taxIds
+  # i.e., limit the search range within those taxIds
+  include:
+  # examples:
+  # - 2               # Bacteria
+  # - 2157            # Archaea
+  # - 2759            # Eukaryota
+
+  # exclude taxIds equal to or as children of any of the following taxIds
+  exclude:
+  # examples:
+  # - 10239           # Viruses
+
+  # ignore more than one hit with same taxId (i.e., potential paralogs)
+  unique: yes
+
+  # ignore more than one hit assigned to the same taxonomic rank
+  unirank: # example: species
+
+  # ignore taxon names that are not capitalized
+  capital: yes
+
+  # ignore species names that are not Latinate
+  latin: no
+
+  # ignore taxon names that contain any of the following words
+  block:
+    - unknown
+    - uncultured
+    - unidentified
+    - unclassified
+    - unresolved
+    - environmental
+    - plasmid
+    - vector
+    - synthetic
+    - phage
+
+  # per-source defaults. GTDB names carry rank prefixes and many valid
+  # placeholder labels (g__DUMJ01, g__336-3), so the style filters must be off
+  # or every hit would be silently discarded.
+  profiles:
+    gtdb:
+      capital: no
+      latin: no
+      block: []
+      # if a user turns a style filter on anyway, GTDB's coded labels
+      # (g__DUMJ01, "MK2026 sp010841923") are still kept: they are official
+      # names, not mis-capitalized or non-Latinate ones
+      keep_placeholder: yes
+    ncbi:
+      capital: yes
+      latin: no
+
+## Hit filtering for analysis
+analyze:
+  # one may test multiple sets of filters that are more stringent than the
+  # homology search parameters (see above), so that one does not need to repeat
+  # the expensive search step
+  maxhits:
+  evalue:
+  identity:
+  coverage:
+
+## Taxonomic grouping
+grouping:
+  # assign an input genome to a taxon if it represents this percentage or more
+  # best hits (50-100)
+  inputcov: 75
+
+  # "self" group must be at or above this taxonomic rank (e.g., species)
+  selfrank:
+
+  # "close" group must have this number or more taxa (larger is more
+  # statistically informative, but consider biological question)
+  closesize: 10
+
+  # per-source defaults. A GTDB tree is balanced and dense (r220: 24,959
+  # genera, 5,460 families), so the NCBI default of 10 close taxa is far too
+  # small; archaea are ~18x sparser than bacteria in r220 so they get their
+  # own profile.
+  profiles:
+    gtdb:
+      closesize: 200
+      inputcov: 75
+    gtdb_archaea:
+      closesize: 50
+      inputcov: 75
+
+## HGT prediction statistics
+predict:
+  ## gene score calculation
+  # weigh genes by bit scores (recommended); otherwise simply count occurrence
+  weighted: yes
+
+  ## gene filtering
+  # detect and remove outliers at the high end using this method
+  # options: none, zscore, boxplot
+  outliers: zscore
+
+  # keep orphans (a.k.a. ORFans; gene without non-self hits)
+  orphans: no
+
+  ## kernel density estimation (KDE)
+  # kernel bandwidth value or method for estimation
+  # options: auto, grid, or a number between 0.1 and 1.0
+  #  auto: a built-in algorithm that tests bandwidth values from high to low
+  #    until an "atypical" cluster at the low end can be identified
+  #  grid: grid search optimization with cross validation to determine the best
+  #    bandwidth
+  #  number: larger is smoother; smaller is sharper
+  bandwidth: auto
+
+  # number of steps for kernel bandwidth optimization,
+  # larger is more accurate, but slower
+  bwsteps: 20
+
+  # "atypical" part cannot exceed this quantile in automatic bandwidth
+  # estimation
+  # lower is more accurate but may fail in more instances
+  lowpart: 75
+
+  # exclude this percentage of valley-to-peak distance from "atypical" cluster
+  # larger is more stringent
+  noise: 50
+
+  # if clustering threshold cannot be determined by statistics, mandatorily
+  # assign this quantile from low end as "atypical" part
+  fixed: 25
+
+  ## cluster refinement
+  # drop data points with silhouette score below this threshold AND at the
+  # ambiguous side of centroid (i.e., uncertain classification)
+  silhouette: 0.5
+
+  # an additional criterion for HGT prediction: "self" score must be atypically
+  # low
+  selflow: no
+
+## Potential donor reporting
+donor:
+  # find a taxId that best describes the potential donor of a gene if it is
+  # HGT-derived; it is the LCA of distal hits with bit score at most this
+  # percentage lower than the best distal hit
+  distaltop: 10
+
+  # report taxon name instead of taxId
+  name: no
+
+  # report donor at this rank
+  rank:

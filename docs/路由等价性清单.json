@@ -1,0 +1,829 @@
+{
+ "generated_from": "neoHGT2GTDB-项目代码",
+ "keys": {
+  "analyze.coverage": {
+   "attr": "coverage",
+   "cli_type": "int",
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "analyze"
+   ],
+   "yaml_type": "NoneType"
+  },
+  "analyze.evalue": {
+   "attr": "evalue",
+   "cli_type": "float",
+   "converter": "float",
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "analyze"
+   ],
+   "yaml_type": "NoneType"
+  },
+  "analyze.identity": {
+   "attr": "identity",
+   "cli_type": "int",
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "analyze"
+   ],
+   "yaml_type": "NoneType"
+  },
+  "analyze.maxhits": {
+   "attr": "maxhits",
+   "cli_type": "int",
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "analyze"
+   ],
+   "yaml_type": "NoneType"
+  },
+  "auto.extrargs": {
+   "attr": "extrargs",
+   "cli_type": null,
+   "converter": null,
+   "divergent": false,
+   "expansion_basis": "self.method expanded over that option's declared choices",
+   "in_config": false,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "str"
+  },
+  "auto.maxchars": {
+   "attr": "maxchars",
+   "cli_type": "int",
+   "converter": null,
+   "divergent": false,
+   "expansion_basis": "self.method expanded over that option's declared choices",
+   "in_config": false,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "str"
+  },
+  "auto.queries": {
+   "attr": "queries",
+   "cli_type": "int",
+   "converter": null,
+   "divergent": false,
+   "expansion_basis": "self.method expanded over that option's declared choices",
+   "in_config": false,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "str"
+  },
+  "blast.extrargs": {
+   "attr": "extrargs",
+   "cli_type": null,
+   "converter": null,
+   "divergent": false,
+   "expansion_basis": "self.method expanded over that option's declared choices",
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "NoneType"
+  },
+  "blast.maxchars": {
+   "attr": "maxchars",
+   "cli_type": "int",
+   "converter": null,
+   "divergent": false,
+   "expansion_basis": "self.method expanded over that option's declared choices",
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "int"
+  },
+  "blast.queries": {
+   "attr": "queries",
+   "cli_type": "int",
+   "converter": null,
+   "divergent": false,
+   "expansion_basis": "self.method expanded over that option's declared choices",
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "int"
+  },
+  "database.taxdump": {
+   "attr": "taxdump",
+   "cli_type": null,
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "NoneType"
+  },
+  "database.taxmap": {
+   "attr": "taxmap",
+   "cli_type": null,
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "NoneType"
+  },
+  "diamond.extrargs": {
+   "attr": "extrargs",
+   "cli_type": null,
+   "converter": null,
+   "divergent": false,
+   "expansion_basis": "self.method expanded over that option's declared choices",
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "NoneType"
+  },
+  "diamond.maxchars": {
+   "attr": "maxchars",
+   "cli_type": "int",
+   "converter": null,
+   "divergent": false,
+   "expansion_basis": "self.method expanded over that option's declared choices",
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "int"
+  },
+  "diamond.queries": {
+   "attr": "queries",
+   "cli_type": "int",
+   "converter": null,
+   "divergent": false,
+   "expansion_basis": "self.method expanded over that option's declared choices",
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "int"
+  },
+  "donor.distaltop": {
+   "attr": "distal_top",
+   "cli_type": "int",
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "analyze"
+   ],
+   "yaml_type": "int"
+  },
+  "donor.name": {
+   "attr": "donor_name",
+   "cli_type": "bool",
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "analyze"
+   ],
+   "yaml_type": "bool"
+  },
+  "donor.rank": {
+   "attr": "donor_rank",
+   "cli_type": null,
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "analyze"
+   ],
+   "yaml_type": "NoneType"
+  },
+  "download.delay": {
+   "attr": "delay",
+   "cli_type": "int",
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "database"
+   ],
+   "yaml_type": "int"
+  },
+  "download.retries": {
+   "attr": "retries",
+   "cli_type": "int",
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "database"
+   ],
+   "yaml_type": "int"
+  },
+  "download.timeout": {
+   "attr": "timeout",
+   "cli_type": "int",
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "database"
+   ],
+   "yaml_type": "int"
+  },
+  "fetch.delay": {
+   "attr": "fetch_delay",
+   "cli_type": "int",
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "int"
+  },
+  "fetch.enable": {
+   "attr": "fetch_enable",
+   "cli_type": null,
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "str"
+  },
+  "fetch.queries": {
+   "attr": "fetch_queries",
+   "cli_type": null,
+   "converter": null,
+   "divergent": true,
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "int"
+  },
+  "fetch.retries": {
+   "attr": "fetch_retries",
+   "cli_type": null,
+   "converter": null,
+   "divergent": true,
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "int"
+  },
+  "fetch.timeout": {
+   "attr": "fetch_timeout",
+   "cli_type": "int",
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "int"
+  },
+  "grouping.closesize": {
+   "attr": "close_size",
+   "cli_type": "int",
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "analyze"
+   ],
+   "yaml_type": "int"
+  },
+  "grouping.inputcov": {
+   "attr": "input_cov",
+   "cli_type": "int",
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "analyze"
+   ],
+   "yaml_type": "int"
+  },
+  "grouping.selfrank": {
+   "attr": "self_rank",
+   "cli_type": null,
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "analyze"
+   ],
+   "yaml_type": "NoneType"
+  },
+  "local.threads": {
+   "attr": "threads",
+   "cli_type": "int",
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "database"
+   ],
+   "yaml_type": "int"
+  },
+  "local.tmpdir": {
+   "attr": "tmpdir",
+   "cli_type": null,
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "database"
+   ],
+   "yaml_type": "NoneType"
+  },
+  "precomp.extrargs": {
+   "attr": "extrargs",
+   "cli_type": null,
+   "converter": null,
+   "divergent": false,
+   "expansion_basis": "self.method expanded over that option's declared choices",
+   "in_config": false,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "str"
+  },
+  "precomp.maxchars": {
+   "attr": "maxchars",
+   "cli_type": "int",
+   "converter": null,
+   "divergent": false,
+   "expansion_basis": "self.method expanded over that option's declared choices",
+   "in_config": false,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "str"
+  },
+  "precomp.queries": {
+   "attr": "queries",
+   "cli_type": "int",
+   "converter": null,
+   "divergent": false,
+   "expansion_basis": "self.method expanded over that option's declared choices",
+   "in_config": false,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "str"
+  },
+  "predict.bandwidth": {
+   "attr": "bandwidth",
+   "cli_type": null,
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "analyze"
+   ],
+   "yaml_type": "str"
+  },
+  "predict.bwsteps": {
+   "attr": "bw_steps",
+   "cli_type": "int",
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "analyze"
+   ],
+   "yaml_type": "int"
+  },
+  "predict.fixed": {
+   "attr": "fixed",
+   "cli_type": "float",
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "analyze"
+   ],
+   "yaml_type": "int"
+  },
+  "predict.lowpart": {
+   "attr": "low_part",
+   "cli_type": "float",
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "analyze"
+   ],
+   "yaml_type": "int"
+  },
+  "predict.noise": {
+   "attr": "noise",
+   "cli_type": "float",
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "analyze"
+   ],
+   "yaml_type": "int"
+  },
+  "predict.orphans": {
+   "attr": "orphans",
+   "cli_type": null,
+   "converter": null,
+   "divergent": true,
+   "in_config": true,
+   "modules": [
+    "analyze"
+   ],
+   "yaml_type": "bool"
+  },
+  "predict.outliers": {
+   "attr": "outliers",
+   "cli_type": null,
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "analyze"
+   ],
+   "yaml_type": "str"
+  },
+  "predict.selflow": {
+   "attr": "self_low",
+   "cli_type": null,
+   "converter": null,
+   "divergent": true,
+   "in_config": true,
+   "modules": [
+    "analyze"
+   ],
+   "yaml_type": "bool"
+  },
+  "predict.silhouette": {
+   "attr": "silhouette",
+   "cli_type": "float",
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "analyze"
+   ],
+   "yaml_type": "float"
+  },
+  "predict.weighted": {
+   "attr": "weighted",
+   "cli_type": null,
+   "converter": null,
+   "divergent": true,
+   "in_config": true,
+   "modules": [
+    "analyze"
+   ],
+   "yaml_type": "bool"
+  },
+  "program.blastdbcmd": {
+   "attr": "blastdbcmd",
+   "cli_type": null,
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "NoneType"
+  },
+  "program.blastp": {
+   "attr": "blastp",
+   "cli_type": null,
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "NoneType"
+  },
+  "program.diamond": {
+   "attr": "diamond",
+   "cli_type": null,
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "database",
+    "search"
+   ],
+   "yaml_type": "NoneType"
+  },
+  "program.makeblastdb": {
+   "attr": "makeblastdb",
+   "cli_type": null,
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "database"
+   ],
+   "yaml_type": "NoneType"
+  },
+  "remote.algorithm": {
+   "attr": "algorithm",
+   "cli_type": null,
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "str"
+  },
+  "remote.db": {
+   "attr": "db",
+   "cli_type": null,
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "str"
+  },
+  "remote.delay": {
+   "attr": "delay",
+   "cli_type": "int",
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "int"
+  },
+  "remote.entrez": {
+   "attr": "entrez",
+   "cli_type": null,
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "str"
+  },
+  "remote.extrargs": {
+   "attr": "extrargs",
+   "cli_type": null,
+   "converter": null,
+   "divergent": false,
+   "expansion_basis": "self.method expanded over that option's declared choices",
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "str"
+  },
+  "remote.maxchars": {
+   "attr": "maxchars",
+   "cli_type": "int",
+   "converter": null,
+   "divergent": false,
+   "expansion_basis": "self.method expanded over that option's declared choices",
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "int"
+  },
+  "remote.queries": {
+   "attr": "queries",
+   "cli_type": "int",
+   "converter": null,
+   "divergent": false,
+   "expansion_basis": "self.method expanded over that option's declared choices",
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "int"
+  },
+  "remote.timeout": {
+   "attr": "timeout",
+   "cli_type": "int",
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "int"
+  },
+  "search.coverage": {
+   "attr": "coverage",
+   "cli_type": "int",
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "int"
+  },
+  "search.evalue": {
+   "attr": "evalue",
+   "cli_type": "float",
+   "converter": "float",
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "float"
+  },
+  "search.identity": {
+   "attr": "identity",
+   "cli_type": "int",
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "int"
+  },
+  "search.maxseqs": {
+   "attr": "maxseqs",
+   "cli_type": "int",
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "int"
+  },
+  "search.method": {
+   "attr": "method",
+   "cli_type": null,
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "str"
+  },
+  "search.minsize": {
+   "attr": "minsize",
+   "cli_type": "int",
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "int"
+  },
+  "search.selfaln": {
+   "attr": "aln_method",
+   "cli_type": null,
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "str"
+  },
+  "server.fetch": {
+   "attr": "fetch_server",
+   "cli_type": null,
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "str"
+  },
+  "server.search": {
+   "attr": "server",
+   "cli_type": null,
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "str"
+  },
+  "server.selfaln": {
+   "attr": "aln_server",
+   "cli_type": null,
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "str"
+  },
+  "taxonomy.block": {
+   "attr": "block",
+   "cli_type": null,
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "database",
+    "search"
+   ],
+   "yaml_type": "list"
+  },
+  "taxonomy.capital": {
+   "attr": "capital",
+   "cli_type": null,
+   "converter": null,
+   "divergent": true,
+   "in_config": true,
+   "modules": [
+    "database",
+    "search"
+   ],
+   "yaml_type": "bool"
+  },
+  "taxonomy.exclude": {
+   "attr": "tax_exclude",
+   "cli_type": null,
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "NoneType"
+  },
+  "taxonomy.include": {
+   "attr": "tax_include",
+   "cli_type": null,
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "NoneType"
+  },
+  "taxonomy.latin": {
+   "attr": "latin",
+   "cli_type": null,
+   "converter": null,
+   "divergent": true,
+   "in_config": true,
+   "modules": [
+    "database",
+    "search"
+   ],
+   "yaml_type": "bool"
+  },
+  "taxonomy.unique": {
+   "attr": "tax_unique",
+   "cli_type": null,
+   "converter": null,
+   "divergent": true,
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "bool"
+  },
+  "taxonomy.unirank": {
+   "attr": "tax_unirank",
+   "cli_type": null,
+   "converter": null,
+   "divergent": false,
+   "in_config": true,
+   "modules": [
+    "search"
+   ],
+   "yaml_type": "NoneType"
+  }
+ },
+ "note": "one record per config key the stage modules read; a key whose two routes hand over different objects needs a converter or a named neutralizer (register rule 19)",
+ "unresolved_call_sites": []
+}

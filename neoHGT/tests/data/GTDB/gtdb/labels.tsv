@@ -1,0 +1,33 @@
+# neoHGT version=2.0b3; gtdb_release=220; layout=gtdb-r220-renamed; generated=2026-11-02 17:23:30.406148
+taxid	label	rank	name	cluster_letter	n_genomes
+100000000	d__Archaea	domain	Archaea		1
+100000001	d__Bacteria	domain	Bacteria		5
+101000000	p__Nanoarchaeota	phylum	Nanoarchaeota		1
+101000001	p__Cyanobacteriota	phylum	Cyanobacteriota		1
+101000002	p__DUMJ01	phylum	DUMJ01		1
+101000003	p__Pseudomonadota	phylum	Pseudomonadota		3
+102000000	c__Nanoarchaeia	class	Nanoarchaeia		1
+102000001	c__Cyanobacteriia	class	Cyanobacteriia		1
+102000002	c__DUMJ01	class	DUMJ01		1
+102000003	c__Gammaproteobacteria	class	Gammaproteobacteria		3
+103000000	o__Nanoarchaeales	order	Nanoarchaeales		1
+103000001	o__PCC-6307	order	PCC-6307		1
+103000002	o__DUMJ01	order	DUMJ01		1
+103000003	o__Enterobacterales	order	Enterobacterales		3
+104000000	f__Nanoarchaeaceae	family	Nanoarchaeaceae		1
+104000001	f__Cyanobiaceae	family	Cyanobiaceae		1
+104000002	f__DUMJ01	family	DUMJ01		1
+104000003	f__Enterobacteriaceae	family	Enterobacteriaceae		2
+104000004	f__Enterobacteriaceae_A	family	Enterobacteriaceae	A	1
+105000000	g__Nanoarchaeum	genus	Nanoarchaeum		1
+105000001	g__Synechococcus_C	genus	Synechococcus	C	1
+105000002	g__DUMJ01	genus	DUMJ01		1
+105000003	g__Escherichia	genus	Escherichia		1
+105000004	g__Salmonella	genus	Salmonella		1
+105000005	g__Wigglesworthia	genus	Wigglesworthia		1
+106000000	s__Nanoarchaeum equitans	species	Nanoarchaeum equitans		1
+106000001	s__Synechococcus_C sp000063505	species	Synechococcus sp000063505	C	1
+106000002	s__DUMJ01 sp012839925	species	DUMJ01 sp012839925		1
+106000003	s__Escherichia fergusonii	species	Escherichia fergusonii		1
+106000004	s__Salmonella houtenae	species	Salmonella houtenae		1
+106000005	s__Wigglesworthia glossinidia_A	species	Wigglesworthia glossinidia	A	1

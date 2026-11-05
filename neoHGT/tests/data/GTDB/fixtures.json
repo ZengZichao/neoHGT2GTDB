@@ -1,0 +1,94 @@
+{
+ "layout": "gtdb-r220-renamed",
+ "release": "220",
+ "gtdb_dir": "GTDB_r220",
+ "genomes": [
+  {
+   "label": "cluster_letter_family",
+   "accession": "GB_GCA_000008885.1",
+   "domain": "bacteria",
+   "source_path": "00_GTDB_r220_aa/protein_faa_reps/bacteria/GB_GCA_000008885.1_d_Bacteria_p_Pseudomonadota_c_Gammaproteobacteria_o_Enterobacterales_f_Enterobacteriaceae_A_g_Wigglesworthia.faa",
+   "source_sha256": "2b90319ef21b26f86761485dbc291be1c06126a7a77893b8a9cc7cd23b0ae7e6",
+   "source_bytes": 380154,
+   "fixture_copy": "fixtures/protein/GB_GCA_000008885.1_d_Bacteria_p_Pseudomonadota_c_Gammaproteobacteria_o_Enterobacterales_f_Enterobacteriaceae_A_g_Wigglesworthia.faa",
+   "fixture_sha256": "2b90319ef21b26f86761485dbc291be1c06126a7a77893b8a9cc7cd23b0ae7e6",
+   "kb_excerpt": "neoHGT/tests/data/GTDB/protein/GB_GCA_000008885.1_d_Bacteria_p_Pseudomonadota_c_Gammaproteobacteria_o_Enterobacterales_f_Enterobacteriaceae_A_g_Wigglesworthia.faa",
+   "kb_records": 5,
+   "copied_at": "2026-11-02 17:23:25.247304"
+  },
+  {
+   "label": "archaeal_genome",
+   "accession": "GB_GCA_000008085.1",
+   "domain": "archaea",
+   "source_path": "00_GTDB_r220_aa/protein_faa_reps/archaea/GB_GCA_000008085.1_d_Archaea_p_Nanoarchaeota_c_Nanoarchaeia_o_Nanoarchaeales_f_Nanoarchaeaceae_g_Nanoarchaeum.faa",
+   "source_sha256": "0a8fdd0311ee5dd5b2376667a2e4cb9eb283cd77ba8d5ad7bf2e48b393fcffd6",
+   "source_bytes": 299900,
+   "fixture_copy": "fixtures/protein/GB_GCA_000008085.1_d_Archaea_p_Nanoarchaeota_c_Nanoarchaeia_o_Nanoarchaeales_f_Nanoarchaeaceae_g_Nanoarchaeum.faa",
+   "fixture_sha256": "0a8fdd0311ee5dd5b2376667a2e4cb9eb283cd77ba8d5ad7bf2e48b393fcffd6",
+   "kb_excerpt": "neoHGT/tests/data/GTDB/protein/GB_GCA_000008085.1_d_Archaea_p_Nanoarchaeota_c_Nanoarchaeia_o_Nanoarchaeales_f_Nanoarchaeaceae_g_Nanoarchaeum.faa",
+   "kb_records": 5,
+   "copied_at": "2026-11-02 17:23:25.249994"
+  },
+  {
+   "label": "placeholder_genus",
+   "accession": "GB_GCA_012839925.1",
+   "domain": "bacteria",
+   "source_path": "00_GTDB_r220_aa/protein_faa_reps/bacteria/GB_GCA_012839925.1_d_Bacteria_p_DUMJ01_c_DUMJ01_o_DUMJ01_f_DUMJ01_g_DUMJ01.faa",
+   "source_sha256": "ee266af5668bbc4df9753450d6675d2b75aa041ff95bc7fb32afda261375947e",
+   "source_bytes": 1096746,
+   "fixture_copy": "fixtures/protein/GB_GCA_012839925.1_d_Bacteria_p_DUMJ01_c_DUMJ01_o_DUMJ01_f_DUMJ01_g_DUMJ01.faa",
+   "fixture_sha256": "ee266af5668bbc4df9753450d6675d2b75aa041ff95bc7fb32afda261375947e",
+   "kb_excerpt": "neoHGT/tests/data/GTDB/protein/GB_GCA_012839925.1_d_Bacteria_p_DUMJ01_c_DUMJ01_o_DUMJ01_f_DUMJ01_g_DUMJ01.faa",
+   "kb_records": 5,
+   "copied_at": "2026-11-02 17:23:25.331610"
+  },
+  {
+   "label": "hyphen_ranks",
+   "accession": "GB_GCA_000063505.1",
+   "domain": "bacteria",
+   "source_path": "00_GTDB_r220_aa/protein_faa_reps/bacteria/GB_GCA_000063505.1_d_Bacteria_p_Cyanobacteriota_c_Cyanobacteriia_o_PCC-6307_f_Cyanobiaceae_g_Synechococcus_C.faa",
+   "source_sha256": "31636ea45e2530234fcbea366f5b7712d4ce1980c9f5e118908cc40263ad61df",
+   "source_bytes": 1376394,
+   "fixture_copy": "fixtures/protein/GB_GCA_000063505.1_d_Bacteria_p_Cyanobacteriota_c_Cyanobacteriia_o_PCC-6307_f_Cyanobiaceae_g_Synechococcus_C.faa",
+   "fixture_sha256": "31636ea45e2530234fcbea366f5b7712d4ce1980c9f5e118908cc40263ad61df",
+   "kb_excerpt": "neoHGT/tests/data/GTDB/protein/GB_GCA_000063505.1_d_Bacteria_p_Cyanobacteriota_c_Cyanobacteriia_o_PCC-6307_f_Cyanobiaceae_g_Synechococcus_C.faa",
+   "kb_records": 5,
+   "copied_at": "2026-11-02 17:23:25.355661"
+  },
+  {
+   "label": "reference_genus",
+   "accession": "RS_GCF_000026225.1",
+   "domain": "bacteria",
+   "source_path": "00_GTDB_r220_aa/protein_faa_reps/bacteria/RS_GCF_000026225.1_d_Bacteria_p_Pseudomonadota_c_Gammaproteobacteria_o_Enterobacterales_f_Enterobacteriaceae_g_Escherichia.faa",
+   "source_sha256": "287a9137f0cfcff0f1c4f8c0cf2057d833d853c9571bf0b06a9d9ea9e5375e35",
+   "source_bytes": 2546536,
+   "fixture_copy": "fixtures/protein/RS_GCF_000026225.1_d_Bacteria_p_Pseudomonadota_c_Gammaproteobacteria_o_Enterobacterales_f_Enterobacteriaceae_g_Escherichia.faa",
+   "fixture_sha256": "287a9137f0cfcff0f1c4f8c0cf2057d833d853c9571bf0b06a9d9ea9e5375e35",
+   "kb_excerpt": "neoHGT/tests/data/GTDB/protein/RS_GCF_000026225.1_d_Bacteria_p_Pseudomonadota_c_Gammaproteobacteria_o_Enterobacterales_f_Enterobacteriaceae_g_Escherichia.faa",
+   "kb_records": 5,
+   "copied_at": "2026-11-02 17:23:25.479296"
+  },
+  {
+   "label": "second_genus_same_family",
+   "accession": "GB_GCA_900478215.1",
+   "domain": "bacteria",
+   "source_path": "00_GTDB_r220_aa/protein_faa_reps/bacteria/GB_GCA_900478215.1_d_Bacteria_p_Pseudomonadota_c_Gammaproteobacteria_o_Enterobacterales_f_Enterobacteriaceae_g_Salmonella.faa",
+   "source_sha256": "51310e3346e6e4bcafd6b06426e174faf411da3a54adf2407211089992a8c733",
+   "source_bytes": 2480080,
+   "fixture_copy": "fixtures/protein/GB_GCA_900478215.1_d_Bacteria_p_Pseudomonadota_c_Gammaproteobacteria_o_Enterobacterales_f_Enterobacteriaceae_g_Salmonella.faa",
+   "fixture_sha256": "51310e3346e6e4bcafd6b06426e174faf411da3a54adf2407211089992a8c733",
+   "kb_excerpt": "neoHGT/tests/data/GTDB/protein/GB_GCA_900478215.1_d_Bacteria_p_Pseudomonadota_c_Gammaproteobacteria_o_Enterobacterales_f_Enterobacteriaceae_g_Salmonella.faa",
+   "kb_records": 5,
+   "copied_at": "2026-11-02 17:23:25.517278"
+  }
+ ],
+ "derived": {
+  "taxdump_nodes": 32,
+  "stem2taxid": 6,
+  "db_faa_records": 30,
+  "hit_rows": 168,
+  "cross_genome_hits": 150,
+  "hgt_like_queries": 12,
+  "meta_json": true
+ }
+}

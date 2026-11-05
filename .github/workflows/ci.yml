@@ -1,0 +1,273 @@
+name: CI
+
+# Unit + integration tests for the GTDB adaptation, plus the untouched NCBI
+# regression suite. Nothing here contacts the network: the GTDB dataset is
+# read-only local data and all remote channels are disabled by default.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: '17 3 * * *'
+
+env:
+  NEOHGT_ROOT: ${{ github.workspace }}
+  NEOHGT_CODE: ${{ github.workspace }}
+  NEOHGT_CACHE: ${{ github.workspace }}/.test-cache
+  NEOHGT_TMP: ${{ github.workspace }}/.test-tmp
+  PYTHONDONTWRITEBYTECODE: 1
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Mark job start
+        id: start
+        shell: bash
+        run: echo "ts=$(date -u +%Y-%m-%dT%H:%M:%S)" >> "$GITHUB_OUTPUT"
+
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: neohgt
+          python-version: '3.11'
+          channels: conda-forge,bioconda,defaults
+          auto-activate-base: false
+
+      - name: Install dependencies
+        shell: bash -el {0}
+        run: |
+          conda install -y -c bioconda diamond blast
+          conda install -y -c conda-forge numpy scipy pandas scikit-learn matplotlib-base pyyaml
+          python -m pip install pytest
+
+      - name: Install neoHGT
+        shell: bash -el {0}
+        run: python -m pip install --no-deps .
+
+      - name: Unit tests (taxonomy, ranks, workspace guards, no-network)
+        shell: bash -el {0}
+        run: python -m pytest neoHGT/tests/test_util.py neoHGT/tests/test_util_gtdb.py neoHGT/tests/test_gtdb_core.py -q
+
+      - name: GTDB integration tests on committed fixtures
+        shell: bash -el {0}
+        # The fixtures are KB-scale excerpts of GTDB r220 genomes, recorded in
+        # neoHGT/tests/data/GTDB/fixtures.json. No dataset download happens.
+        # The "excerpt" claim is machine-checked by the Fixture provenance step
+        # below when the read-only release is mounted; without it the tests only
+        # assert that the failure is exactly "source not present".
+        run: python -m pytest neoHGT/tests/test_gtdb_pipeline.py -q
+
+      - name: Fixture provenance (every committed sequence traces to the release)
+        shell: bash -el {0}
+        # fixtures.json was written once by tools/make_fixtures.py; recording a
+        # hash is not checking one. This re-reads the release and proves each
+        # committed fixture record exists in its source with the same residues,
+        # that no fixture file lacks a provenance row, that the copies stay
+        # within the ten-genome limit, and that the published db.faa count holds.
+        env:
+          GTDB_DIR: ${{ vars.GTDB_DIR }}
+        run: |
+          if [ -z "${GTDB_DIR:-}" ] || [ ! -d "$GTDB_DIR" ]; then
+            echo "GTDB_DIR not provided; the release checks report it as missing"
+            python tools/verify_fixture_provenance.py --code . \
+              | tee provenance.log
+            grep -q 'genomes: 6 (limit 10)' provenance.log || {
+              echo "ERROR: fixture manifest does not list six genomes"; exit 1; }
+            echo "release-independent checks ran; dataset problems reported:"
+            grep -c 'PROBLEM' provenance.log || true
+            exit 0
+          fi
+          python tools/verify_fixture_provenance.py --code . \
+            --gtdb-dir "$GTDB_DIR" | tee provenance.log
+          grep -q '^verdict: PASS' provenance.log || {
+            echo "ERROR: fixture provenance does not trace back to the release";
+            exit 1; }
+
+      - name: Register gate - plan ids vs the ten registers
+        shell: bash -el {0}
+        # The plan document lives outside this repository, so its numbered ids are
+        # frozen into docs/方案编号清单.json (regenerate with
+        # `python tools/verify_plan_traceability.py --plan <plan> --emit-ids docs/方案编号清单.json`).
+        # The gate then checks every register row: the id must exist in the plan,
+        # the status must be in the allowed vocabulary, anything not fully done
+        # must name the missing half, and every backticked path/line/::symbol
+        # citation must still resolve in this checkout. Four ids are evidenced
+        # only by the workspace evidence tree and are reported as unverifiable
+        # here instead of being counted as gaps. It also enforces the option
+        # surface: every §7 flag must be handed to the real parser by some test,
+        # and -- since round 30, extended to all four CLI surfaces in round 34 --
+        # every value in a `choices` list must be handed to its own option by some
+        # test (an unasked-for value like `--mimag any`, or `--action taxdump` that
+        # no test ever passed, is a declared feature that does not exist). Since
+        # round 32 it also re-counts the self-discovery list in
+        # docs/GTDB-数据库.md, whose heading states the item count and the round
+        # span by hand and therefore goes stale exactly when an item is added.
+        # Since round 37 it also requires every test_* function to contain an
+        # observable assertion; the ten upstream ones are declared, not edited
+        # (RT-1 keeps those files append-only).
+        # Since round 33 it also reads every stage's option surface from the real
+        # `arguments` table (the old text regex could not see an entry whose
+        # option string sits on its own line) and checks the `neoHGT <subcommand>`
+        # examples in README.md and docs/*.md against that stage's own options.
+        # Since round 40 it also requires every config.yml key this adaptation
+        # introduced to be read by code (and every key code reads to exist): a knob
+        # nothing reads is a setting that only looks like one. Since round 52 the
+        # population of "keys this adaptation introduced" is the diff against the
+        # upstream config.yml rather than "the key's name contains gtdb" -- the
+        # name test had quietly defined its own scope, so `workspace.code_dir` and
+        # `database.source` (both ours, both promised by a sentence in the file or
+        # a docstring) were never candidates for "unread" while the summary said
+        # "0 inert config knobs". Where no upstream copy is reachable, which is the
+        # case in this job, the rule falls back to the name population and writes
+        # that into the summary line instead of reporting a clean result.
+        # Since round 54 the same rule also sees the other way config.yml is read:
+        # `get_config(self, key, f'search.{key}')` builds its path from an entry
+        # *string*, and that half had never been judged (measured: 26 subscript
+        # paths and 73 entry paths, disjoint). Paths whose section comes from an
+        # option value are handed to rule 23, which requires a written disposition
+        # per candidate section that config.yml lacks and then checks the claim in
+        # the code -- a `raise` that still names every option it refuses, or an
+        # `if` that still rebinds the attribute on every path before the read.
+        # Rule 24 lists the document sections the gate itself slices out and fails
+        # if one is no longer a heading: rounds 53 and 54 each lost one to an edit,
+        # and a missing heading makes its reader report "nothing to check".
+        # Pass C of round 54 then found the other half of that hazard: the slices
+        # began at the token's *first mention*, so one prose line naming a section
+        # relocated the reader (rule 23 reported its two dispositions as missing).
+        # Every section is now located by `doc_section`, which anchors on the
+        # heading line and ends at the next heading; two of the six readers had no
+        # end anchor at all and were exempting options for the rest of the file --
+        # wider than the section's own preamble promises.
+        # Since round 44 the same reader also judges the plan's own examples when
+        # --plan is available, and nightly runs the gate that way: the PR job only
+        # has the frozen id digest, so the plan's command lines went unchecked.
+        # Since round 43 it also checks the option VALUES of the documented
+        # examples: `--source` has different value sets per stage (database has
+        # no `auto`), so a flag-level check passes `neoHGT database --source
+        # auto` while argparse would not. Only fenced command lines are judged,
+        # and a rule that judges nothing -- or reads a file whose code fences do
+        # not pair up -- reports itself as blind.
+        # Since round 42 it re-derives, from analyze.py's call graph, the options
+        # `--from-scores` cannot honour -- the ones whose only reader lives in a
+        # skipped step -- and compares that set with the REUSE_INERT list the run
+        # prints: declared-dead-but-live, dead-but-undeclared, and a stale
+        # exemption are all problems. The traversal refuses to *enter* the skipped
+        # steps rather than subtracting them by name, because a helper both routes
+        # reach (detect_gtdb_root) must stay live.
+        # Since round 47 it also audits route equivalence (rule 19) against the
+        # committed docs/路由等价性清单.json: a config key whose CLI route and config
+        # route hand over different objects needs a converter or a written reason.
+        # Round 49 added rule 19b on top of that -- the written reason is itself
+        # checked: the normaliser it names must exist, cover that key's attribute,
+        # run after the config read (or point at a test that pins the order by
+        # execution), and every location the sentence cites must be defined. That
+        # is what caught three reasons naming a search.py function that never
+        # existed; before it, an explanation could rot without any gate noticing.
+        # Round 50 added rule 20: the defaults the docs promise are compared with the
+        # value the code delivers (table `default=`, an `a or b or 'literal'` chain, a
+        # per-domain profile, a `True if unset` branch, an explicit `if unset` guard,
+        # and an `... is True` expression), and the promise sentence must still be
+        # written where the claim says it is. It found a real one: a default GTDB run
+        # wrote the synthetic taxId into the donor column while the deliverables table
+        # promised prefixed labels. Values the rule cannot resolve are reported as
+        # unjudgeable in the summary line rather than counted as agreement.
+        # Round 51 added rule 21: a value that can reach code as None must not be used
+        # in a numeric position (range(), a slice bound, a comparison with a number)
+        # without a guard naming that attribute -- the shape behind all three of this
+        # project's type-related defects. It reads by call form, including
+        # `getattr(args, 'x', None)` where the attribute name is a string, drops
+        # attributes that are overwritten from another source before use (and prints
+        # how many it dropped), and refuses to call `%`-formatting arithmetic. The
+        # delivery census this started from disagreed with itself six times, which is
+        # why the rule asserts one direction instead of classifying everything.
+        # Round 50 added rule 20: the defaults the docs promise are compared with the
+        # value the code delivers (table `default=`, an `a or b or 'literal'` chain, a
+        # per-domain profile, a `True if unset` branch, an explicit `if unset` guard,
+        # and an `... is True` expression), and the promise sentence must still be
+        # written where the claim says it is. It found a real one: a default GTDB run
+        # wrote the synthetic taxId into the donor column while the deliverables table
+        # promised prefixed labels. Values the rule cannot resolve are reported as
+        # unjudgeable in the summary line rather than counted as agreement.
+        run: |
+          mkdir -p .gate
+          python tools/verify_plan_traceability.py --code . \
+            --out .gate/plan_traceability.json | tee gate.log
+          grep -q '0 problem(s) -> PASS' gate.log || {
+            echo "ERROR: register gate did not pass"; exit 1; }
+
+      - name: Production reachability (can a CLI path arrive at it?)
+        shell: bash -el {0}
+        # Execution coverage asks "did a test call this?"; this asks "can the
+        # command line?". `--hybrid-lca-policy` passed the first and failed the
+        # second: the resolver was validated and printed into the build report
+        # but no build path called it. The list of functions this adaptation
+        # added is frozen in docs/新增函数清单.json (regenerate locally with
+        # `python tools/verify_production_reachability.py --emit-added ...`),
+        # because CI has no pristine upstream tree to diff against. Anything
+        # unreachable has to be declared in docs/交付物清单.md, 可达性偏差.
+        # The committed list carries BOTH halves (added + upstream names), so a
+        # function added after the freeze is reported as UNTRACKED instead of
+        # quietly never being judged; locally, --check-list additionally diffs
+        # the committed list against a fresh comparison with the upstream tree.
+        run: |
+          python tools/verify_production_reachability.py --code . \
+            --added docs/新增函数清单.json --out .gate/reachability.json \
+            | tee reach.log
+          grep -q 'problems: 0 undeclared' reach.log || {
+            echo "ERROR: reachability gate found undeclared functions"; exit 1; }
+
+      - name: NCBI regression (RT-1)
+        shell: bash -el {0}
+        # RT-1 is a "no new failure" gate, not an "all green" gate: 13 tests in
+        # this pre-existing suite already fail on the unmodified upstream code
+        # (plot format expectations; the baseline was recorded without
+        # DIAMOND/BLAST on PATH, so the four search/diamond failures are
+        # environment-bound and this step tolerates them). The list is
+        # committed as ci/rt1_baseline_failures.txt, produced locally by
+        # tools/verify_regression.py; anything failing beyond it is a regression.
+        run: |
+          python -m pytest neoHGT/tests/test_search.py neoHGT/tests/test_analyze.py \
+            neoHGT/tests/test_database.py -q --tb=no \
+            | tee ncbi-regression.log || true
+          test -s ci/rt1_baseline_failures.txt || {
+            echo "ERROR: ci/rt1_baseline_failures.txt missing"; exit 1; }
+          # A gate that parses nothing must not report success - require both a
+          # pytest summary line and the known pre-existing failures.
+          grep -qE "[0-9]+ (failed|passed)" ncbi-regression.log || {
+            echo "ERROR: pytest produced no summary (did the suite run at all?)"; exit 1; }
+          grep '^FAILED' ncbi-regression.log | cut -d' ' -f2 | LC_ALL=C sort > cur.txt
+          grep -v '^#' ci/rt1_baseline_failures.txt | LC_ALL=C sort > base.txt
+          # zero failures is a SUCCESS here, not a parse error: the old
+          # `test -s cur.txt` made a fully green suite fail the gate and
+          # rewarded keeping the upstream failures alive. The summary-line grep
+          # above already proves the suite ran; an empty cur.txt means empty
+          # baseline conformance.
+          : > cur_ok.txt
+          if [ -s cur.txt ]; then cp cur.txt cur_ok.txt; fi
+          new=$(LC_ALL=C comm -13 base.txt cur_ok.txt)
+          if [ -n "$new" ]; then
+            echo "ERROR: failures that do not exist upstream:"
+            echo "$new"
+            exit 1
+          fi
+          echo "RT-1 OK: $(wc -l < cur_ok.txt) failing tests, all pre-existing upstream"
+
+      - name: Guard - the read-only GTDB input must never be written
+        shell: bash -el {0}
+        env:
+          GTDB_DIR: ${{ vars.GTDB_DIR }}
+          SINCE: ${{ steps.start.outputs.ts }}
+        run: |
+          if [ -z "${GTDB_DIR:-}" ] || [ ! -d "$GTDB_DIR" ]; then
+            echo "GTDB_DIR not provided; skipping the read-only guard"
+            exit 0
+          fi
+          changed=$(find "$GTDB_DIR" -newermt "$SINCE" -type f 2>/dev/null | head -1)
+          if [ -n "$changed" ]; then
+            echo "ERROR: GTDB input was modified during this job: $changed"
+            exit 1
+          fi
+          echo "GTDB input untouched since $SINCE"

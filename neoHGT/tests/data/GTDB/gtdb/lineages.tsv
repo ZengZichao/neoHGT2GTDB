@@ -1,0 +1,8 @@
+# neoHGT version=2.0b3; gtdb_release=220; layout=gtdb-r220-renamed; generated=2026-11-02 17:23:30.406296
+accession	domain	gtdb_taxonomy	species_taxid
+GB_GCA_000063505.1	bacteria	d__Bacteria;p__Cyanobacteriota;c__Cyanobacteriia;o__PCC-6307;f__Cyanobiaceae;g__Synechococcus_C;s__Synechococcus_C sp000063505	106000001
+GB_GCA_012839925.1	bacteria	d__Bacteria;p__DUMJ01;c__DUMJ01;o__DUMJ01;f__DUMJ01;g__DUMJ01;s__DUMJ01 sp012839925	106000002
+GB_GCA_900478215.1	bacteria	d__Bacteria;p__Pseudomonadota;c__Gammaproteobacteria;o__Enterobacterales;f__Enterobacteriaceae;g__Salmonella;s__Salmonella houtenae	106000004
+RS_GCF_000026225.1	bacteria	d__Bacteria;p__Pseudomonadota;c__Gammaproteobacteria;o__Enterobacterales;f__Enterobacteriaceae;g__Escherichia;s__Escherichia fergusonii	106000003
+GB_GCA_000008885.1	bacteria	d__Bacteria;p__Pseudomonadota;c__Gammaproteobacteria;o__Enterobacterales;f__Enterobacteriaceae_A;g__Wigglesworthia;s__Wigglesworthia glossinidia_A	106000005
+GB_GCA_000008085.1	archaea	d__Archaea;p__Nanoarchaeota;c__Nanoarchaeia;o__Nanoarchaeales;f__Nanoarchaeaceae;g__Nanoarchaeum;s__Nanoarchaeum equitans	106000000
