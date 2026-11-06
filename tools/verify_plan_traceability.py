@@ -4017,8 +4017,12 @@ def main():
     # A repository checkout has the code, the registers and the digest, but not
     # the workspace evidence tree, so artifact-only ids cannot be verified here.
     # They are reported as unverifiable rather than silently passed or counted as
-    # gaps, which would make the CI step fail for the wrong reason.
+    # gaps, which would make the CI step fail for the wrong reason. The cache
+    # directory alone is not the tree: the test suite creates it empty on a
+    # runner, so it counts as mounted only once it holds an expected artifact.
     cache_present = bool(args.cache) and isdir(args.cache)
+    evidence_mounted = cache_present and any(
+        exists(join(args.cache, a)) for a in EVIDENCE.values())
     unverifiable = []
     concrete = [i for i in ids if not i.endswith(GROUP_SUFFIX)]
     for i in ids:
@@ -4040,7 +4044,7 @@ def main():
             # an id evidenced only by a workspace artifact is not "untraceable"
             # here, it is simply not checkable without that artifact
             here = bool(test) or ok_artifact or (bool(artifact)
-                                                 and not cache_present)
+                                                 and not evidence_mounted)
             rows.append({'id': i, 'kind': 'test' if test else 'artifact',
                          'tests': test or [],
                          'artifact': artifact, 'artifact_exists': ok_artifact,

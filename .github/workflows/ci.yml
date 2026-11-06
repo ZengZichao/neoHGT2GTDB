@@ -58,29 +58,80 @@ jobs:
         # neoHGT/tests/data/GTDB/fixtures.json. No dataset download happens.
         run: python -m pytest neoHGT/tests/test_gtdb_pipeline.py -q
 
+      - name: Locate the read-only GTDB release
+        id: gtdb
+        shell: bash -el {0}
+        # A directory named by GTDB_DIR is not necessarily the release: on a
+        # runner the variable can point at a path that exists for other
+        # reasons. The release counts as mounted only when at least one
+        # manifest source really exists under it.
+        env:
+          GTDB_DIR: ${{ vars.GTDB_DIR }}
+        run: |
+          mounted=0
+          if [ -n "${GTDB_DIR:-}" ] && [ -d "$GTDB_DIR" ]; then
+            mounted=$(python - "$GTDB_DIR" <<'PY'
+          import json, os, sys
+          root = sys.argv[1]
+          with open('neoHGT/tests/data/GTDB/fixtures.json', encoding='utf-8') as f:
+              man = json.load(f)
+          paths = [g.get('source_path') for g in man.get('genomes', [])]
+          found = [p for p in paths if p and os.path.isfile(
+              p if os.path.isabs(p) else os.path.join(root, p))]
+          print(1 if found else 0)
+          PY
+          )
+          fi
+          echo "mounted=$mounted" >> "$GITHUB_OUTPUT"
+          if [ "$mounted" = "1" ]; then
+            echo "GTDB release mounted at $GTDB_DIR"
+          else
+            echo "no GTDB release at ${GTDB_DIR:-<unset>}; dataset-dependent checks report or skip"
+          fi
+
       - name: Fixture provenance (every committed sequence traces to the release)
         shell: bash -el {0}
         # Re-reads the release and checks that every committed fixture record
         # exists in its source with the same residues, that no fixture file
         # lacks a provenance row, and that the published db.faa count holds.
+        # Without the release the source-level checks can only report the six
+        # sources as absent; the step then gates what does not need the data
+        # (six genomes, the db.faa record count, no orphan fixture file).
         env:
+          PYTHONIOENCODING: utf-8
           GTDB_DIR: ${{ vars.GTDB_DIR }}
         run: |
-          if [ -z "${GTDB_DIR:-}" ] || [ ! -d "$GTDB_DIR" ]; then
-            echo "GTDB_DIR not provided; the release checks report it as missing"
+          if [ "${{ steps.gtdb.outputs.mounted }}" = "1" ]; then
+            rc=0
             python tools/verify_fixture_provenance.py --code . \
-              | tee provenance.log
-            grep -q 'genomes: 6 (limit 10)' provenance.log || {
-              echo "ERROR: fixture manifest does not list six genomes"; exit 1; }
-            echo "release-independent checks ran; dataset problems reported:"
-            grep -c 'PROBLEM' provenance.log || true
+              --gtdb-dir "$GTDB_DIR" > provenance.log 2>&1 || rc=$?
+            cat provenance.log
+            grep -q '^verdict: PASS' provenance.log || {
+              echo "::error title=fixture-provenance::the fixtures do not trace to the mounted release (script exit $rc): $(tail -n 5 provenance.log | tr '\n' ' ')"
+              exit 1; }
             exit 0
           fi
-          python tools/verify_fixture_provenance.py --code . \
-            --gtdb-dir "$GTDB_DIR" | tee provenance.log
-          grep -q '^verdict: PASS' provenance.log || {
-            echo "ERROR: fixture provenance does not trace back to the release";
+          rc=0
+          python tools/verify_fixture_provenance.py --code . > provenance.log 2>&1 || rc=$?
+          cat provenance.log
+          grep -q 'genomes: 6 (limit 10)' provenance.log || {
+            echo "::error title=fixture-provenance::the fixture manifest does not list six genomes (script exit $rc): $(tail -n 5 provenance.log | tr '\n' ' ')"
             exit 1; }
+          grep -q 'db.faa records: 30' provenance.log || {
+            echo "::error title=fixture-provenance::db.faa does not hold the 30 published records"
+            exit 1; }
+          problems=$(grep -c '^  PROBLEM' provenance.log || true)
+          absent=$(grep -c '^  PROBLEM .*的来源文件已不存在' provenance.log || true)
+          if [ "$rc" != "0" ] && [ "$problems" = "0" ]; then
+            echo "::error title=fixture-provenance::the script failed without reporting a fixture problem (exit $rc): $(tail -n 5 provenance.log | tr '\n' ' ')"
+            exit 1
+          fi
+          if [ "$problems" != "$absent" ]; then
+            echo "::error title=fixture-provenance::release-independent fixture checks failed:"
+            grep '^  PROBLEM' provenance.log | grep -v '的来源文件已不存在' || true
+            exit 1
+          fi
+          echo "release-independent checks ran; $absent source(s) absent as expected without the dataset"
 
       - name: Documentation links, anchors and language
         shell: bash -el {0}
@@ -155,14 +206,11 @@ jobs:
 
       - name: Guard - the read-only GTDB input must never be written
         shell: bash -el {0}
+        if: steps.gtdb.outputs.mounted == '1'
         env:
           GTDB_DIR: ${{ vars.GTDB_DIR }}
           SINCE: ${{ steps.start.outputs.ts }}
         run: |
-          if [ -z "${GTDB_DIR:-}" ] || [ ! -d "$GTDB_DIR" ]; then
-            echo "GTDB_DIR not provided; skipping the read-only guard"
-            exit 0
-          fi
           changed=$(find "$GTDB_DIR" -newermt "$SINCE" -type f 2>/dev/null | head -1)
           if [ -n "$changed" ]; then
             echo "ERROR: GTDB input was modified during this job: $changed"
