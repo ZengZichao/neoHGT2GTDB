@@ -1,13 +1,17 @@
 # RT-1 baseline: the tests that already fail on the unmodified upstream code.
 #
-# Produced by tools/verify_regression.py against the pristine neoHGT-main tree
-# (python 3.12.7, DIAMOND/BLAST not on PATH, matplotlib PDF expectations), where
-# the suite reports "13 failed, 106 passed". The adapted tree must fail exactly
-# this set - zero new failures (plan DoD-7 / RT-1). Failing an id that is *not*
-# listed here means this project introduced a regression.
+# Produced by running test_search.py, test_analyze.py and test_database.py
+# against the pristine neoHGT-main tree in the same environment CI installs
+# (python 3.11, pandas 3.1.1, numpy 2.4.6, scipy 1.17.1, scikit-learn 1.9.1,
+# matplotlib-base 3.10.9, DIAMOND 2.2.8 and BLAST 2.17.0 on PATH), where the
+# suite reports "14 failed, 73 passed". The adapted tree fails exactly this
+# set (77 passed), so the adaptation adds no new failure (plan DoD-7 / RT-1).
+# Failing an id that is *not* listed here means this project introduced a
+# regression.
 #
-# reason categories: plot format/expectation changes, external binaries missing
-neoHGT/tests/test_analyze.py::AnalyzeTests::test___call__
+# reason categories: plot format/expectation changes, score/format changes in
+# newer external binaries, pandas 3.x removal of positional indexing on
+# non-integer indexes
 neoHGT/tests/test_analyze.py::AnalyzeTests::test_cluster_kde
 neoHGT/tests/test_analyze.py::AnalyzeTests::test_plot_hgts
 neoHGT/tests/test_analyze.py::AnalyzeTests::test_predict_hgt
@@ -15,7 +19,9 @@ neoHGT/tests/test_analyze.py::AnalyzeTests::test_smart_kde
 neoHGT/tests/test_database.py::DatabaseTests::test_build_blast_db
 neoHGT/tests/test_database.py::DatabaseTests::test_compile_database
 neoHGT/tests/test_database.py::DatabaseTests::test_filter_genomes
+neoHGT/tests/test_database.py::DatabaseTests::test_genome_lineages
 neoHGT/tests/test_database.py::DatabaseTests::test_sample_by_taxonomy
+neoHGT/tests/test_search.py::SearchTests::test_blast_search
 neoHGT/tests/test_search.py::SearchTests::test_diamond_search
 neoHGT/tests/test_search.py::SearchTests::test_diamond_selfaln
 neoHGT/tests/test_search.py::SearchTests::test_search_wf

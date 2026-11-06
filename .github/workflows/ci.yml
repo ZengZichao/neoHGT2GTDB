@@ -39,9 +39,13 @@ jobs:
 
       - name: Install dependencies
         shell: bash -el {0}
+        # Pinned because ci/rt1_baseline_failures.txt was recorded with these
+        # versions; an unpinned solve silently changes the upstream failure
+        # set (newer BLAST scores, pandas 3.x indexing).
         run: |
-          conda install -y -c bioconda diamond blast
-          conda install -y -c conda-forge numpy scipy pandas scikit-learn matplotlib-base pyyaml
+          conda install -y -c bioconda diamond=2.2.8 blast=2.17.0
+          conda install -y -c conda-forge numpy=2.4.6 scipy=1.17.1 \
+            pandas=3.1.1 scikit-learn=1.9.1 matplotlib-base=3.10.9 pyyaml
           python -m pip install pytest
 
       - name: Install neoHGT
@@ -180,10 +184,11 @@ jobs:
       - name: NCBI regression (RT-1)
         shell: bash -el {0}
         # This is a "no new failure" gate, not an "all green" gate: the
-        # pre-existing upstream suite has 13 failures in this environment
-        # (plot-format assertions and external binaries). The baseline is
-        # ci/rt1_baseline_failures.txt; anything failing beyond it is a
-        # regression.
+        # pre-existing upstream suite has 14 failures in this environment
+        # (plot-format assertions, newer BLAST/DIAMOND score formats, pandas
+        # 3.x indexing). The baseline is ci/rt1_baseline_failures.txt, recorded
+        # from the pristine upstream tree with the pinned versions above;
+        # anything failing beyond it is a regression.
         run: |
           python -m pytest neoHGT/tests/test_search.py neoHGT/tests/test_analyze.py \
             neoHGT/tests/test_database.py -q --tb=no \
