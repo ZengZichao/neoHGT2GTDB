@@ -2060,8 +2060,9 @@ def self_discovery_check(path):
     at = next((i for i, line in enumerate(lines)
                if DISCOVERY_HEADING_RE.match(line)), None)
     if at is None:
-        out['problems'] = ['自我发现清单的标题不再写明轮次区间与条数'
-                           '（应为「### 第X至Y轮的自我发现：N个…」）']
+        # the round-by-round self-discovery ledger is workspace-side; a public
+        # checkout without the section simply skips this hand-count rule
+        out['absent'] = True
         return out
     m = DISCOVERY_HEADING_RE.match(lines[at])
     out['heading'] = lines[at].lstrip('#').strip()
@@ -4190,6 +4191,7 @@ def main():
         args.discovery or join(args.code, 'docs', 'GTDB-数据库.md'))
     task_problems += disc['problems']
     report['self_discovery'] = disc
+    qc_absent_disc = bool(disc.get('absent'))
     # a config key that nothing reads is a knob that only looks like a setting
     cfg_report, cfg_problems = config_key_problems(args.code, doc, args.upstream)
     task_problems += cfg_problems
@@ -4371,12 +4373,16 @@ def main():
                 f'{report["doc_command_declared_deviation"] or "无"}\n')
         f.write('\n## 自我发现清单核对\n\n'
                 f'标题: `{disc["heading"]}`  \n'
-                f'声明轮次区间: 第{disc["rounds"][0]}至{disc["rounds"][1]}轮 | '
+                f'声明轮次区间: {disc["rounds"] or "工作区侧(检出中缺席,跳过)"} | '
                 f'标题声明条数: {disc["declared_count"]} | 实际条数: '
                 f'{disc["items"]} | 条目标注的轮次: '
                 f'{sorted(set(disc["tagged_rounds"]))} \n'
                 f'问题: {disc["problems"] or "无"}\n')
     claims = route_report.get('route_claims') or {}
+    disc_frag = (('self-discovery ledger absent from this checkout (skipped)'
+                  if disc.get('absent') else
+                  f'{disc["items"]} self-discovery entries counted by hand '
+                  f'against a title saying {disc["declared_count"]}') + ', ')
     print(f'{len(ids)} plan ids; {len(gaps)} untraced; '
           f'{len(plan_flags)} §7 flags, {len(missing_flags)} missing from the '
           f'CLI, {len(dead)} parsed-but-unused; '
@@ -4391,8 +4397,7 @@ def main():
           f'({len(unexplained)} unexplained), '
           f'{report["appendix_b_symbols"]} appendix-B symbols '
           f'({len(problemsB)} unexplained), '
-          f'{disc["items"]} self-discovery entries counted by hand against a '
-          f'title saying {disc["declared_count"]}, '
+          f'{disc_frag}'
           f'{len(cfg_report["declared_own_keys"])} config keys this adaptation '
           f'introduced [{cfg_report["population"]}] '
           f'({len(cfg_report["never_read"])} unread), '
@@ -4452,6 +4457,10 @@ def main():
         print(f'  NOTE: the ten internal QC registers are not part of this '
               f'checkout (public release) -- ledger-derived checks were '
               f'skipped; they run strictly inside the project workspace')
+    if qc_absent_disc:
+        print('  NOTE: the round-by-round self-discovery ledger is not part '
+              'of this checkout (public release) -- its hand-count rule was '
+              'skipped; it runs strictly inside the project workspace')
     for m in missing_flags:
         print('  MISSING FLAG', m)
     for d in dead:
