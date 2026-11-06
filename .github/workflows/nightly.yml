@@ -19,14 +19,14 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true          # a benchmark report, not a gate
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: conda-incubator/setup-miniconda@v3
+      - uses: conda-incubator/setup-miniconda@v4
         with:
           activate-environment: neohgt
           python-version: '3.11'
           channels: conda-forge,bioconda,defaults
-          auto-activate-base: false
+          auto-activate: false
 
       - name: Install dependencies
         shell: bash -el {0}
@@ -37,7 +37,37 @@ jobs:
           python -m pip install --no-deps -e .
           python -m pip install pytest
 
+      - name: Locate the read-only GTDB release
+        id: gtdb
+        shell: bash -el {0}
+        # A path that exists for another reason is not the release; only the
+        # benchmarks that can read a manifest source run against GTDB_DIR.
+        env:
+          GTDB_DIR: ${{ vars.GTDB_DIR }}
+        run: |
+          mounted=0
+          if [ -n "${GTDB_DIR:-}" ] && [ -d "$GTDB_DIR" ]; then
+            mounted=$(python - "$GTDB_DIR" <<'PY'
+          import json, os, sys
+          root = sys.argv[1]
+          with open('neoHGT/tests/data/GTDB/fixtures.json', encoding='utf-8') as f:
+              man = json.load(f)
+          paths = [g.get('source_path') for g in man.get('genomes', [])]
+          found = [p for p in paths if p and os.path.isfile(
+              p if os.path.isabs(p) else os.path.join(root, p))]
+          print(1 if found else 0)
+          PY
+          )
+          fi
+          echo "mounted=$mounted" >> "$GITHUB_OUTPUT"
+          if [ "$mounted" = "1" ]; then
+            echo "GTDB release mounted at $GTDB_DIR"
+          else
+            echo "no GTDB release at ${GTDB_DIR:-<unset>}; dataset benchmarks skip"
+          fi
+
       - name: Taxonomy conversion benchmark
+        if: steps.gtdb.outputs.mounted == '1'
         shell: bash -el {0}
         run: |
           mkdir -p reports
@@ -49,6 +79,7 @@ jobs:
           GTDB_DIR: ${{ vars.GTDB_DIR }}
 
       - name: Fastest tier build benchmark
+        if: steps.gtdb.outputs.mounted == '1'
         shell: bash -el {0}
         run: |
           mkdir -p reports
@@ -86,6 +117,7 @@ jobs:
           cat reports/stream_*.txt || true
 
       - name: Dataset consistency audit
+        if: steps.gtdb.outputs.mounted == '1'
         shell: bash -el {0}
         env:
           GTDB_DIR: ${{ vars.GTDB_DIR }}
@@ -112,6 +144,7 @@ jobs:
           exit $rc
 
       - name: Read-only guard for the input dataset
+        if: steps.gtdb.outputs.mounted == '1'
         shell: bash -el {0}
         env:
           GTDB_DIR: ${{ vars.GTDB_DIR }}
@@ -145,7 +178,7 @@ jobs:
             echo "ERROR: register gate did not pass"; exit 1; }
           test -n "${PLAN_PATH:-}" || echo "plan example values: not checked"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: nightly-benchmarks

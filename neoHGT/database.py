@@ -408,7 +408,7 @@ class Database(object):
 			# ===== bug fix =====
 			col = df.columns[0]
 			if col.startswith('#'):
-				df.rename(columns={col: col.lstrip('# ')}, inplace=True)
+				df = df.rename(columns={col: col.lstrip('# ')})
 			print(' done.')
 			return df
 
@@ -508,15 +508,14 @@ class Database(object):
 
 		# non-redundant genome IDs
 		# typically not necessary, just in case
-		self.df.rename(columns={'assembly_accession': 'accession'},
-					   inplace=True)
+		self.df = self.df.rename(columns={'assembly_accession': 'accession'})
 		#//////////////////////////////////////////////////
 		# bug: split('.', 1) is not in the standard of modern Python
 		self.df['accnov'] = self.df['accession'].str.split('.').str[0]
 		# # bug: split('_', 1) is not in the standard of modern Python
 		self.df['genome'] = 'G' + self.df['accnov'].str.split('_').str[-1]
 		#//////////////////////////////////////////////////
-		self.df.drop_duplicates(subset=['genome'], inplace=True)
+		self.df = self.df.drop_duplicates(subset=['genome'])
 
 		# include/exclude genome Ids
 		if self.genoids:
@@ -537,7 +536,7 @@ class Database(object):
 				self.sample = None
 
 		# genomes without download link
-		self.df.query('ftp_path != "na"', inplace=True)
+		self.df = self.df.query('ftp_path != "na"')
 		report_diff('Dropped {} genomes without download link.')
 		print('Done.')
 
@@ -557,10 +556,10 @@ class Database(object):
 			 'Contig': 2})
 
 		# sort genomes by three criteria
-		self.df.sort_values(by=['rc_seq', 'al_seq', 'genome'], inplace=True)
+		self.df = self.df.sort_values(by=['rc_seq', 'al_seq', 'genome'])
 
 		# clean up temporary columns
-		self.df.drop(columns=['al_seq', 'rc_seq'], inplace=True)
+		self.df = self.df.drop(columns=['al_seq', 'rc_seq'])
 
 	def filter_by_taxonomy(self):
 		"""Filter genomes by taxonomy.
@@ -590,10 +589,10 @@ class Database(object):
 						'organism name.')
 
 		# remove original species information
-		self.df.drop(columns=['species_taxid'], inplace=True)
+		self.df = self.df.drop(columns=['species_taxid'])
 
 		# drop genomes whose taxIds are not in taxdump
-		self.df.dropna(subset=['taxid'], inplace=True)
+		self.df = self.df.dropna(subset=['taxid'])
 		self.df['taxid'] = self.df['taxid'].astype(str)
 		self.df = self.df[self.df['taxid'].isin(self.taxdump)]
 		report_diff('Dropped {} genomes without valid taxId.')
@@ -603,14 +602,14 @@ class Database(object):
 			taxid_at_rank, rank='species', taxdump=self.taxdump)
 
 		# drop genomes without species taxId
-		self.df.dropna(subset=['species'], inplace=True)
+		self.df = self.df.dropna(subset=['species'])
 		report_diff('Dropped {} genomes without valid species taxId.')
 
 		# drop genomes without Latinate species name
 		self.df['latin'] = self.df['species'].apply(
 			lambda x: is_latin(self.taxdump[x]['name']))
 		if self.latin:
-			self.df.query('latin', inplace=True)
+			self.df = self.df.query('latin')
 			report_diff('Dropped {} genomes without Latinate species name.')
 		print('Done.')
 
@@ -694,7 +693,7 @@ class Database(object):
 
 		print(f'  Sampled a total of {len(self.selected)} genomes at '
 			  f'{rank} and above.')
-		self.df.drop(columns=['tmp_rank'], inplace=True)
+		self.df = self.df.drop(columns=['tmp_rank'])
 
 	def sample_by_quality(self):
 		"""Sample genomes according to quality categories.
@@ -723,8 +722,8 @@ class Database(object):
 		n = len(self.selected)
 		if n == 0:
 			raise ValueError('No genome is retained after sampling.')
-		self.df.query('genome in @self.selected', inplace=True)
-		self.df.sort_values('genome', inplace=True)
+		self.df = self.df.query('genome in @self.selected')
+		self.df = self.df.sort_values('genome')
 		print(f'Total number of sampled genomes: {n}.')
 
 	def download_genomes(self):
@@ -776,7 +775,7 @@ class Database(object):
 			print('Failed to retrieve the following genomes:')
 			print('  ' + ', '.join(failed))
 			failed = set(failed)
-			self.df.query('genome not in @failed', inplace=True)
+			self.df = self.df.query('genome not in @failed')
 
 	def extract_genomes(self):
 		"""Extract proteins from genomes.
@@ -901,9 +900,13 @@ class Database(object):
 		for rank in ranks:
 			print(f'  {rank}: {self.df[rank].nunique()}.')
 
+		# missing ranks are absent, not a value; normalise them before building
+		# the lineage so None/NaN and '' behave the same on pandas 2 and 3
+		self.df[ranks] = self.df[ranks].astype(object).fillna('')
+
 		# merge superkingdom and kingdom
 		self.df['kingdom'] = self.df[['superkingdom', 'kingdom']].apply(
-			lambda x: x[1] if x[1] else x[0], axis=1)
+			lambda x: x.iloc[1] if x.iloc[1] else x.iloc[0], axis=1)
 
 		# generate lineage string
 		self.df['lineage'] = self.df[ranks[1:]].fillna('').apply(
@@ -924,7 +927,7 @@ class Database(object):
 		-----
 		Write genome metadata to genomes.tsv.
 		"""
-		self.df.set_index('genome', inplace=True)
+		self.df = self.df.set_index('genome')
 		self.df = self.df[[
 			'proteins', 'residues', 'assembly_level',
 			'accession', 'bioproject', 'biosample', 'asm_name',

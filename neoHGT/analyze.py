@@ -637,7 +637,7 @@ class Analyze(object):
         Remove ORFan rows from the score table `df` in-place.
         """
         n = self.df.shape[0]
-        self.df.query('close + distal > 0', inplace=True)
+        self.df = self.df.query('close + distal > 0')
         print(f'Removed {n - self.df.shape[0]} ORFans.')
 
     def remove_outliers(self):

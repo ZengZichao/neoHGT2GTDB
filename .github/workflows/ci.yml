@@ -23,19 +23,19 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Mark job start
         id: start
         shell: bash
         run: echo "ts=$(date -u +%Y-%m-%dT%H:%M:%S)" >> "$GITHUB_OUTPUT"
 
-      - uses: conda-incubator/setup-miniconda@v3
+      - uses: conda-incubator/setup-miniconda@v4
         with:
           activate-environment: neohgt
           python-version: '3.11'
           channels: conda-forge,bioconda,defaults
-          auto-activate-base: false
+          auto-activate: false
 
       - name: Install dependencies
         shell: bash -el {0}
@@ -185,10 +185,12 @@ jobs:
         shell: bash -el {0}
         # This is a "no new failure" gate, not an "all green" gate: the
         # pre-existing upstream suite has 14 failures in this environment
-        # (plot-format assertions, newer BLAST/DIAMOND score formats, pandas
-        # 3.x indexing). The baseline is ci/rt1_baseline_failures.txt, recorded
-        # from the pristine upstream tree with the pinned versions above;
-        # anything failing beyond it is a regression.
+        # (plot-format assertions, newer BLAST/DIAMOND score formats,
+        # pre-existing upstream test state). The adapted tree fixes
+        # test_genome_lineages and fails the remaining 13; the allow-list is
+        # ci/rt1_baseline_failures.txt, recorded from the pristine upstream
+        # tree with the pinned versions above; anything beyond it is a
+        # regression.
         run: |
           python -m pytest neoHGT/tests/test_search.py neoHGT/tests/test_analyze.py \
             neoHGT/tests/test_database.py -q --tb=no \
