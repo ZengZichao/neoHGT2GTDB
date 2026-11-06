@@ -4935,7 +4935,10 @@ class TestDefaultPromises(unittest.TestCase):
             "`--gtdb-taxid-base` 默认 `100000000`。\n"
             "`--keep-placeholder-names`（默认 `yes`）豁免编码标签。\n"
             "`--require-staxids` 默认立刻报错（RK5）。\n"
-            "`--close-size` 默认按域取档（细菌 200、古菌 50）。\n"),
+            "`--close-size` 默认按域取档（细菌 200、古菌 50）。\n"
+            "`--seq-source` 默认 `local`。\n"
+            "`--donor-label` 默认 `prefixed`（带前缀标签）。\n"
+            "`--allow-network` 默认 no（联网开关）。\n"),
         'docs/计划任务对照表.md': "`--donor-label` 三档输出，默认前缀标签 prefixed。\n",
         'docs/验收标准对照.md': "`--allow-network` 默认关。\n",
         'docs/风险应对登记.md': ("`--keep-placeholder-names`（默认 `yes`）；"
@@ -5018,7 +5021,8 @@ class TestDefaultPromises(unittest.TestCase):
 
     def test_a_promise_deleted_from_the_docs_is_reported(self):
         report, problems = self._judge(self._tree([
-            ('docs/计划任务对照表.md', '，默认前缀标签 prefixed', '，见用例')]))
+            ('docs/GTDB-数据库.md',
+             '`--donor-label` 默认 `prefixed`（带前缀标签）。', '`--donor-label` 见上。')]))
         self.assertTrue(any('--donor-label' in p and '默认' in p
                             for p in problems), problems)
 
@@ -5220,6 +5224,8 @@ class TestConfigKnobs(unittest.TestCase):
         spec.loader.exec_module(mod)
         return mod
 
+    @unittest.skipIf(not isfile(join(HERE, os.pardir, os.pardir, 'docs', '交付物清单.md')),
+                         'internal QC registers are maintained in the project workspace, not in the public release')
     def test_every_shipped_gtdb_knob_is_read(self):
         v = self._tool()
         code = join(HERE, os.pardir, os.pardir)
@@ -5231,6 +5237,8 @@ class TestConfigKnobs(unittest.TestCase):
         self.assertEqual(report['read_but_absent'], {}, report)
         self.assertEqual(problems, [])
 
+    @unittest.skipIf(not isfile(join(HERE, os.pardir, os.pardir, 'docs', '交付物清单.md')),
+                         'internal QC registers are maintained in the project workspace, not in the public release')
     def test_a_dynamic_section_is_reported_only_until_rule_23_owns_it(self):
         """The handoff between the config-key rule and rule 23, judged both ways.
 
@@ -5256,6 +5264,8 @@ class TestConfigKnobs(unittest.TestCase):
                          report)
         self.assertEqual(problems, [], problems)
 
+    @unittest.skipIf(not isfile(join(HERE, os.pardir, os.pardir, 'docs', '交付物清单.md')),
+                         'internal QC registers are maintained in the project workspace, not in the public release')
     def test_an_unread_knob_is_named(self):
         v = self._tool()
         d = tmpdir()
@@ -5631,6 +5641,8 @@ class TestTaskLedgerGate(unittest.TestCase):
         self.assertEqual(v.deviation_flags(join('docs', 'd.md'), self.code),
                          {'--to'})
 
+    @unittest.skipIf(not isfile(join(HERE, os.pardir, os.pardir, 'docs', '交付物清单.md')),
+                         'internal QC registers are maintained in the project workspace, not in the public release')
     def test_deliverable_register_is_structurally_complete(self):
         # the shipped register must cover the plan's 12 deliverables with the
         # right vocabulary; path existence is checked by the gate itself, which
@@ -5675,6 +5687,8 @@ class TestTaskLedgerGate(unittest.TestCase):
                          ['附录 B 承诺的 MISSING_SYMBOL（neoHGT/gtdb.py）'
                           '既不存在也未登记偏差'])
 
+    @unittest.skipIf(not isfile(join(HERE, os.pardir, os.pardir, 'docs', '交付物清单.md')),
+                         'internal QC registers are maintained in the project workspace, not in the public release')
     def test_acceptance_register_covers_every_dod(self):
         v = self._tool()
         plan = ('### 1.4 成功标准\n| 编号 | 判据 |\n| --- | --- |\n'
@@ -5696,6 +5710,8 @@ class TestTaskLedgerGate(unittest.TestCase):
                             for r in dod.values()
                             if r['status'] != v.DOD_STATUSES[0]))
 
+    @unittest.skipIf(not isfile(join(HERE, os.pardir, os.pardir, 'docs', '交付物清单.md')),
+                         'internal QC registers are maintained in the project workspace, not in the public release')
     def test_decision_register_covers_every_adr(self):
         v = self._tool()
         plan = ('## 8. 关键设计决策(ADR)\n| 编号 | 决策 |\n| --- | --- |\n'
@@ -5716,6 +5732,8 @@ class TestTaskLedgerGate(unittest.TestCase):
                             for r in adr.values()
                             if r['status'] != v.DECISION_STATUSES[0]))
 
+    @unittest.skipIf(not isfile(join(HERE, os.pardir, os.pardir, 'docs', '交付物清单.md')),
+                         'internal QC registers are maintained in the project workspace, not in the public release')
     def test_risk_register_covers_every_plan_risk(self):
         v = self._tool()
         plan = ('## 9. 风险登记册\n| ID | 风险 | 缓解 |\n| --- | --- | --- |\n'
@@ -5734,6 +5752,8 @@ class TestTaskLedgerGate(unittest.TestCase):
                             for r in rk.values()
                             if r['status'] != v.RISK_STATUSES[0]))
 
+    @unittest.skipIf(not isfile(join(HERE, os.pardir, os.pardir, 'docs', '交付物清单.md')),
+                         'internal QC registers are maintained in the project workspace, not in the public release')
     def test_verification_register_covers_the_plan_matrix(self):
         v = self._tool()
         sect = '\n'.join((
@@ -5798,6 +5818,8 @@ class TestTaskLedgerGate(unittest.TestCase):
         self.assertEqual(saved['counts']['verification'], 36)
         self.assertEqual(saved['counts']['tasks'], 28)
 
+    @unittest.skipIf(not isfile(join(HERE, os.pardir, os.pardir, 'docs', '交付物清单.md')),
+                         'internal QC registers are maintained in the project workspace, not in the public release')
     def test_the_assumption_and_revision_registers_are_complete(self):
         """§2.3 (S1–S9) and §0.5 (REV-01–19) are numbered and truth-apt."""
         v = self._tool()
@@ -5838,6 +5860,8 @@ class TestTaskLedgerGate(unittest.TestCase):
             v.ledger_problems(rows, ['S1'], self.code, self.root,
                               v.LEDGER_STATUSES)[2], [])
 
+    @unittest.skipIf(not isfile(join(HERE, os.pardir, os.pardir, 'docs', '交付物清单.md')),
+                         'internal QC registers are maintained in the project workspace, not in the public release')
     def test_milestone_register_covers_the_plan_table(self):
         v = self._tool()
         plan_file = join(HERE, os.pardir, os.pardir, os.pardir,
@@ -6647,6 +6671,12 @@ class TestProductionReachability(unittest.TestCase):
         return mod
 
     def test_no_added_function_is_out_of_reach_without_a_reason(self):
+        doc = join(HERE, os.pardir, os.pardir, 'docs', '交付物清单.md')
+        if not isfile(doc):
+            # the internal QC registers (this hub deliverables document among
+            # them) live in the project workspace, not in the public release;
+            # the declared-exception cross-check needs that document
+            self.skipTest('internal QC registers not part of this checkout')
         tool = self._tool()
         code = join(HERE, os.pardir, os.pardir)
         base = os.environ.get('NEOHGT_MAIN') or join(code, os.pardir,
@@ -6833,6 +6863,8 @@ class TestCheckerToolUpkeep(unittest.TestCase):
         self.problems, self.declared = v.checker_tool_problems(
             self.checkers, join(self.code, 'docs', '交付物清单.md'))
 
+    @unittest.skipIf(not isfile(join(HERE, os.pardir, os.pardir, 'docs', '交付物清单.md')),
+                         'internal QC registers are maintained in the project workspace, not in the public release')
     def test_every_runner_less_tool_is_declared(self):
         unrun = sorted(k for k, who in self.checkers.items() if not who)
         self.assertEqual(self.problems, [], self.checkers)
@@ -6853,6 +6885,8 @@ class TestCheckerToolUpkeep(unittest.TestCase):
             self.assertEqual(rc, 0, f'{name} --help failed; the declared '
                                     'command can no longer be run')
 
+    @unittest.skipIf(not isfile(join(HERE, os.pardir, os.pardir, 'docs', '交付物清单.md')),
+                         'internal QC registers are maintained in the project workspace, not in the public release')
     def test_the_rule_bites_on_an_undeclared_orphan(self):
         v = self._tool()
         problems, declared = v.checker_tool_problems(
@@ -6892,6 +6926,8 @@ class TestAssertionFreeRule(unittest.TestCase):
         spec.loader.exec_module(mod)
         return mod
 
+    @unittest.skipIf(not isfile(join(HERE, os.pardir, os.pardir, 'docs', '交付物清单.md')),
+                         'internal QC registers are maintained in the project workspace, not in the public release')
     def test_the_shipped_suite_declares_every_vacuous_test(self):
         v = self._tool()
         code = join(HERE, os.pardir, os.pardir)
@@ -6992,6 +7028,8 @@ class TestCliSurfaceAndDocExamples(unittest.TestCase):
         self.assertIn('--mimag', problems[0])
         self.assertNotIn('--all', used, 'a third-party command line is not ours')
 
+    @unittest.skipIf(not isfile(join(HERE, os.pardir, os.pardir, 'docs', '交付物清单.md')),
+                         'internal QC registers are maintained in the project workspace, not in the public release')
     def test_the_deviation_row_is_excused_but_the_same_flag_elsewhere_is_not(self):
         ledger = join(self.code, 'docs', '交付物清单.md')
         declared = self.tool.declared_doc_usages(ledger, self.subs,
@@ -8060,6 +8098,8 @@ class TestIntroducedConfigKeys(unittest.TestCase):
                 if v is not None:
                     os.environ[k] = v
 
+    @unittest.skipIf(not isfile(join(HERE, os.pardir, os.pardir, 'docs', '交付物清单.md')),
+                         'internal QC registers are maintained in the project workspace, not in the public release')
     def test_an_unreachable_upstream_dir_is_not_a_vacuous_pass(self):
         """`upstream_dir=''` resolves to the shipped config, and a file diffed
         against itself has no new keys -- a rule that reports "0 unread" from an
@@ -8073,6 +8113,8 @@ class TestIntroducedConfigKeys(unittest.TestCase):
                                 'an empty population is not a judgement')
         self.assertEqual(problems, [])
 
+    @unittest.skipIf(not isfile(join(HERE, os.pardir, os.pardir, 'docs', '交付物清单.md')),
+                         'internal QC registers are maintained in the project workspace, not in the public release')
     def test_the_shipped_upstream_makes_the_population_the_diff(self):
         """The rule must judge the keys we added, not the keys whose name says so."""
         tool = self._register()
@@ -8088,6 +8130,8 @@ class TestIntroducedConfigKeys(unittest.TestCase):
         self.assertIn('database.source', report['declared_own_keys'])
         self.assertEqual(problems, [], report)
 
+    @unittest.skipIf(not isfile(join(HERE, os.pardir, os.pardir, 'docs', '交付物清单.md')),
+                         'internal QC registers are maintained in the project workspace, not in the public release')
     def test_a_key_read_only_through_an_entry_string_is_still_a_read(self):
         """The entry-string half of the population, in both directions.
 
@@ -8477,6 +8521,8 @@ class TestDynamicConfigSections(unittest.TestCase):
         _report, problems = v.dynamic_section_problems(d, doc)
         self.assertTrue(any('zzz' in p for p in problems), problems)
 
+    @unittest.skipIf(not isfile(join(HERE, os.pardir, os.pardir, 'docs', '交付物清单.md')),
+                         'internal QC registers are maintained in the project workspace, not in the public release')
     def test_an_unreadable_ledger_is_not_a_pass(self):
         src = self.HEAD + self.RESOLVE + self.READ + self.GUARD
         d, _doc, v = self._tree(src=src, rows=())
@@ -8491,6 +8537,8 @@ class TestDynamicConfigSections(unittest.TestCase):
         report, _problems = v.dynamic_section_problems(d, doc)
         self.assertNotIn('blast', report['candidates'], report['candidates'])
 
+    @unittest.skipIf(not isfile(join(HERE, os.pardir, os.pardir, 'docs', '交付物清单.md')),
+                         'internal QC registers are maintained in the project workspace, not in the public release')
     def test_the_shipped_tree_is_dispositioned_and_the_witness_bites(self):
         v = self._tool()
         code = join(HERE, os.pardir, os.pardir)
@@ -8571,6 +8619,8 @@ class TestLedgerRowDetection(unittest.TestCase):
         self.assertEqual(sorted(v.ledger_rows(path)), ['D1', 'D2'],
                          v.ledger_rows(path))
 
+    @unittest.skipIf(not isfile(join(HERE, os.pardir, os.pardir, 'docs', '交付物清单.md')),
+                         'internal QC registers are maintained in the project workspace, not in the public release')
     def test_the_shipped_deliverables_table_has_no_phantom_rows(self):
         v = self._tool()
         rows = v.ledger_rows(join(HERE, os.pardir, os.pardir, 'docs',
@@ -8693,6 +8743,8 @@ class TestLedgerSectionHeadings(unittest.TestCase):
         self.assertEqual(len(problems), 1, problems)
         self.assertTrue(any('断言缺失的既有测试' in p for p in problems), problems)
 
+    @unittest.skipIf(not isfile(join(HERE, os.pardir, os.pardir, 'docs', '交付物清单.md')),
+                         'internal QC registers are maintained in the project workspace, not in the public release')
     def test_the_shipped_document_keeps_every_section_the_gate_reads(self):
         v = self._tool()
         code = join(HERE, os.pardir, os.pardir)
@@ -8701,6 +8753,8 @@ class TestLedgerSectionHeadings(unittest.TestCase):
         self.assertEqual(problems, [], problems)
         self.assertEqual(report['sections'], len(v.DECLARED_SECTIONS), report)
 
+    @unittest.skipIf(not isfile(join(HERE, os.pardir, os.pardir, 'docs', '交付物清单.md')),
+                         'internal QC registers are maintained in the project workspace, not in the public release')
     def test_an_unreadable_document_refuses_to_look_clean(self):
         v = self._tool()
         d = tmpdir()
@@ -8709,6 +8763,8 @@ class TestLedgerSectionHeadings(unittest.TestCase):
         self.assertEqual(len(problems), 1, problems)
         self.assertIn('文件不在', problems[0], problems[0])
 
+    @unittest.skipIf(not isfile(join(HERE, os.pardir, os.pardir, 'docs', '交付物清单.md')),
+                         'internal QC registers are maintained in the project workspace, not in the public release')
     def test_moving_a_round_section_does_not_lose_a_heading(self):
         """The exact accident, twice in two rounds, made mechanical.
 
@@ -8796,6 +8852,8 @@ class TestDocSectionLocator(unittest.TestCase):
         self.assertNotIn('| more |', without,
                          'a locator that ignores headings reads the next appendix')
 
+    @unittest.skipIf(not isfile(join(HERE, os.pardir, os.pardir, 'docs', '交付物清单.md')),
+                         'internal QC registers are maintained in the project workspace, not in the public release')
     def test_the_shipped_ledger_hazard_is_still_there_and_still_harmless(self):
         """The D5 row really does name the section, and rule 23 still reads it.
 

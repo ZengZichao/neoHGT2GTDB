@@ -200,7 +200,7 @@ The exemption takes effect only on GTDB databases, and it swaps in the predicate
 >   **taxId**, then hands that taxId to `is_latin()` as a "name" — a digit string is never a binomial Latin name, so
 >   every hit was judged "not Latin". The GTDB route now swaps that taxId for its own name before the test
 >   (`neoHGT/search.py::taxfilt_wf_gtdb`); the NCBI route is untouched word for word (RT-1 line-by-line comparison passes),
->   and this upstream defect is recorded on row 3.5 of `docs/计划任务对照表.md`.
+>   and this upstream defect is recorded on row 3.5 of internal QC ledger 《计划任务对照表》 (workspace-side, not part of the public release).
 > - **Strict semantics does not mean rejecting prefixed official names**. `--keep-placeholder-names no` now only cancels the numbered-label exemption;
 >   the predicate still uses the prefix-tolerant version (`s__Halobacterium` still counts as capitalized), because DoD-5 requires judging "by the bare name with the prefix stripped".
 >   Test cases: `neoHGT/tests/test_gtdb_pipeline.py::TestSearchChoiceValues` and
@@ -219,30 +219,30 @@ the last step — the library "looked built" but had no `meta.json`. It now chec
 recorded faithfully when DIAMOND exists").
 
 The item-by-item correspondence between the plan §6's numbered tasks and the implementation is written in
-[`docs/计划任务对照表.md`](计划任务对照表.md) and checked by the traceability gate (IDs complete,
+[internal QC ledger 《计划任务对照表》 (workspace-side, not part of the public release)](计划任务对照表.md) and checked by the traceability gate (IDs complete,
 statuses drawn from a fixed vocabulary, referenced paths actually existing, and "partially implemented / not done" entries required to state clearly what is missing).
 
 The 14 "pre-existing defects shared with this adaptation" listed in the plan's Appendix F are registered in
-[`docs/既有缺陷登记.md`](既有缺陷登记.md): each entry is either **fixed** (with evidence attached) or
+[internal QC ledger 《既有缺陷登记》 (workspace-side, not part of the public release)](既有缺陷登记.md): each entry is either **fixed** (with evidence attached) or
 **registered, not changed**, stating clearly why it was not changed (mostly "fixing it would require deleting existing upstream lines", which conflicts with RT-1's append-only constraint)
 and how to reproduce it. The same gate also checks this table, and line-number references are verified as well (a form like `search.py:1166`
 pointing at a nonexistent line gets reported).
 
 The plan's §9 risk register (19 entries) is checked in
-[`docs/风险应对登记.md`](风险应对登记.md): each entry records "where the mitigation planned in the plan finally landed", with status drawn from
+[internal QC ledger 《风险应对登记》 (workspace-side, not part of the public release)](风险应对登记.md): each entry records "where the mitigation planned in the plan finally landed", with status drawn from
 `已实现缓解 / 部分实现 / 登记接受`; today's score is 16 with mitigation implemented and 3 partially implemented
 (RK7's known-HGT sensitivity validation, RK9's remote resume execution, RK19's "NFS→NFS output" fallback,
 stuck respectively on NCBI reference-library authorization, network-access authorization, and the "must not write outside the workspace" safety rule).
 
 The eighth and ninth tables were added in Round 23: the 9 NCBI assumptions that the plan §2.3 wrote down line by line for `search.py` are checked in
-[`docs/搜索层假设核对.md`](搜索层假设核对.md) (5 adapted for GTDB, 3 confirmed to need no change,
+[internal QC ledger 《搜索层假设核对》 (workspace-side, not part of the public release)](搜索层假设核对.md) (5 adapted for GTDB, 3 confirmed to need no change,
 1 **contrary to what the plan concluded at the time** — the plan considered the BLAST route "feasible", but measurement showed `makeblastdb` cannot build indexes for
 GTDB sequence IDs of 151–270 characters, so `--compile blast/both` was changed to refuse by default and only continue with `--force`, see ADR-8); the 19 review revisions of the plan §0.5 are checked in
-[`docs/方案修订记录核对.md`](方案修订记录核对.md) (18 adopted, 1 partially adopted: REV-12's fixture source and
+[internal QC ledger 《方案修订记录核对》 (workspace-side, not part of the public release)](方案修订记录核对.md) (18 adopted, 1 partially adopted: REV-12's fixture source and
 §10.1 coverage points ⑥⑦ were not copied over, written out item by item in the deliverables document's checklist). These two families are likewise
 "numbered, truth-checkable" plan content that previously had no register at all.
 
-After those nine tables, Round 26 added a tenth (§13 milestone check, `docs/里程碑核对.md`).
+After those nine tables, Round 26 added a tenth (§13 milestone check, internal QC ledger 《里程碑核对》 (workspace-side, not part of the public release)).
 Beyond these tables, the gate itself has now also entered CI: `docs/方案编号清单.json` is a digest freezing every numbered list in the plan
 (276 items: 28 tasks / 14 defects / 12 deliverables / 19 risks / 10 DoD / 11 decisions / 36 verification-matrix entries /
 9 search-layer assumptions / 19 review revisions / 37 test IDs / 27 §7 options / 27 Appendix C/D options / 27 Appendix B symbols),
@@ -253,7 +253,7 @@ going red the moment the digest goes stale. Additionally, this tool itself refus
 (`guarded_out()`, rule 11: `--out /tmp/x` is not a redirect and is not intercepted by `tools/run.sh`, so it has to do its own intercepting).
 
 The plan's §10.2 / §10.3 / §10.4 / §10.5 verification matrix (36 numbered entries: 20 UT, 9 IT, 4 scientific-validity items, 3 RT) is checked in
-[`docs/测试用例对照.md`](测试用例对照.md): each entry states which test case (with `文件:行号`) or which evidence artifact
+[internal QC ledger 《测试用例对照》 (workspace-side, not part of the public release)](测试用例对照.md): each entry states which test case (with `文件:行号`) or which evidence artifact
 covers it, with status drawn from `已覆盖 / 部分覆盖 / 未覆盖`. Currently 33 covered, 0 partially covered, 3 uncovered (IT-3's data-supplementation route, and the 10.4-1 and 10.4-4 head-to-head NCBI reference-library comparisons, all stuck on network access not being authorized). §10.4-3's parameter sensitivity was completed in Round 18: all four knobs — close_size, input_cov, bandwidth, noise — have measured curves, see `缓存测试/reports/S10_4_3_sensitivity.md`. This table grew out of an inventory taken in Round 15: back then it was discovered that
 the derived fixtures required by §10.1 did not exist, and that the GTDB branches of `search`/`analyze` had never had an **offline** end-to-end test —
 laying the verification matrix out as a machine-checkable table exists precisely so that "written in the plan but actually absent from the code" never silently happens again.
@@ -268,7 +268,7 @@ Among these, RK11 was completed this round: GTDB renames higher taxa (`p__Proteo
 `--input-tax` — pass through the alias table before resolution, and when an old name is used, a "this is a deprecated name, X is now used instead" hint is printed.
 
 The 10 acceptance criteria of the plan §1.4/§10.7 (DoD-0…DoD-9) are cross-checked in
-[`docs/验收标准对照.md`](验收标准对照.md): status drawn from `达标 / 部分达标 / 被外部条件阻塞`,
+[internal QC ledger 《验收标准对照》 (workspace-side, not part of the public release)](验收标准对照.md): status drawn from `达标 / 部分达标 / 被外部条件阻塞`,
 each entry with an evidence path. Current state: 9 met + 1 partially met (DoD-2: the representative set's **genome count** is reconciled by a build-time enforcement item,
 while the **protein entry count** is a metadata sum plus extrapolation from measured tiers, because the full extraction was left to the user's decision and was not run).
 The same round folded §3.6's three rows of whole-library file counts (`.faa`/`.fna`/`.tsv`) into the read-only audit:
@@ -278,12 +278,12 @@ The same round folded §3.6's three rows of whole-library file counts (`.faa`/`.
 "leave a trace on every audit" rather than a "build-time equality assertion"; `--no-inventory` turns this inventory off.
 
 The 11 design decisions of the plan §8 (ADR-1…ADR-10 including 4b) land in
-[`docs/决策落点对照.md`](决策落点对照.md): status drawn from
+[internal QC ledger 《决策落点对照》 (workspace-side, not part of the public release)](决策落点对照.md): status drawn from
 `已落实 / 部分落实 / 偏离并说明 / 未落实`, each entry with its code location. Current state: 10 implemented + 1 partially implemented
 (ADR-4's "v1 only promises the representative set" holds in code, but its run-through evidence only goes up to the 3.25M-protein tier; the full tier was not run).
 
 The plan's §12 deliverables (D1–D12) and the **interface shapes of Appendices B/C/D** are checked in
-[`docs/交付物清单.md`](交付物清单.md): each of the 12 deliverables gets a status and an artifact location (D11's full-tier benchmark
+[internal QC ledger 《交付物清单》 (workspace-side, not part of the public release)](交付物清单.md): each of the 12 deliverables gets a status and an artifact location (D11's full-tier benchmark
 and D12's NCBI head-to-head comparison are honestly marked as partially delivered); the 27 functions/classes/constants promised by Appendix B must be findable
 in the code (being located in another module of the same package is allowed), and any that cannot be found must be registered with an explanation in that file's "Appendix B symbol deviations" table;
 the 27 `--flag`s in the Appendix C/D example commands must each be either a real option of this tool's CLI, an option of a third-party tool,
@@ -596,7 +596,7 @@ crashing the program while reading the tree; if none are reachable, an error exp
 of the 27 genera at ≤0.5, 21 had no hits in that 564-genome archive → dropped with warnings, and the close group continued with the remaining taxa.
 Rerunning at this tier with the resolved close group: predictions rose from 371 (9.2% of proteins) to 849 (21.1%),
 while all 53 ar53 conserved marker genes still scored 0 — i.e. the phylogenetically defined close group did not misreport conserved genes
-as HGTs (the same-tier numbers are in the README's GTDB section and the D12 row of `docs/交付物清单.md`).
+as HGTs (the same-tier numbers are in the README's GTDB section).
 
 ### Mapping donor lists back to NCBI taxIds (`map-report`)
 
@@ -884,14 +884,14 @@ Also confirmed along the way: `--from-scores` reusing the already-written `score
     - `--tax-latin yes` (GTDB mode): upstream first resolves the species-level **taxId** and then hands that taxId to
       `is_latin()` as the "name", and a digit string is never a binomial Latin name — **every hit was judged non-Latin**. The fixture does not enable this
       switch by default, so it only shows up when the value is actually handed to the filter. The GTDB route now swaps the taxId for its name before judging;
-      the NCBI route is untouched (RT-1 entry-by-entry comparison passes), and the upstream spot is recorded at line 3.5 of `docs/计划任务对照表.md`.
+      the NCBI route is untouched (RT-1 entry-by-entry comparison passes), and the upstream spot is recorded at line 3.5 of internal QC ledger 《计划任务对照表》 (workspace-side, not part of the public release).
     - `--fetch-enable auto`: the GTDB-mode "force-disabling remote fetching" notice was written inside the `fetch_enable in ('auto','yes')`
       branch, but upstream `args_wf` had long since parsed `auto` into `no`, so **that message could never be printed**: the user thinks the adapter
       turned it off, when in fact upstream's "only enable when there is no taxdump" rule happened to turn it off. The notice now looks at the value the user requested.
     Methodologically this round changed approach: first run each value for real with probes and record artifact hashes
     (`缓存测试/reports/R31_analyze_value_probe.json`, `R31_search_value_probe.json`), then write assertions against the **observed**
     behavior; for values the fixture cannot distinguish (`--keep-unresolved yes|no`) no difference was fabricated — instead the
-    "option value deviations" section of `docs/交付物清单.md` declares "both values were handed to tests, but an input that distinguishes them could not be constructed".
+    "option value deviations" section of internal QC ledger 《交付物清单》 (workspace-side, not part of the public release) declares "both values were handed to tests, but an input that distinguishes them could not be constructed".
     Another process lesson worth keeping: this round at one point recorded "the same fixture gives 28 lines with `-d` and 53 lines without" as an open question;
     re-checking showed it was **a difference of counting convention** — one counted non-comment data rows, the other also counted each query's `#` summary lines; rerun twice with the same
     convention it is 28 lines both times. Fix "what to count" before comparing two runs, otherwise measurement error gets chased as a behavioral difference.
@@ -912,7 +912,7 @@ Also confirmed along the way: `--from-scores` reusing the already-written `score
     is backed by a negative control: `缓存测试/reports/R32_mode_negative_control.json` injects the same wrapped style
     into a temp copy; the AST rule reports that line while the old textual rule says nothing. The reachability conclusions of the same round are in
     `缓存测试/reports/R32_production_reachability.json` (5 added functions are unreachable, each with its reason declared entry by entry in the
-    "reachability deviations" section of `docs/交付物清单.md`; plus a negative control: swap the build-side
+    "reachability deviations" section of internal QC ledger 《交付物清单》 (workspace-side, not part of the public release); plus a negative control: swap the build-side
     `resolve=provider.resolve_shared_protein` for a dummy lambda and that function must become unreachable again).
     The method that stays: **every rule that "scans source code for duplication or omissions" must be written against the syntax tree, not against strings**;
     and every such rule needs a negative control that "injects the defect back in", otherwise we cannot tell whether it is a rule or a decoration.
@@ -932,7 +932,7 @@ Also confirmed along the way: `--from-scores` reusing the already-written `score
     (the gate only checked the plan's Appendix C/D). The new rule `tools/verify_plan_traceability.py::doc_command_flags` only scans the segment following
     `neoHGT <子命令>` (`conda remove -n neoHGT --all` mentions the product name but is not our command line),
     and judges pairwise by **(subcommand, option)** — an option legal under `gtdb` but absent under `analyze` must still be reported
-    (the first version aggregated by option and would have let this kind of error through). Its first run immediately hit the row in the Appendix C/D deviation table of `docs/交付物清单.md`:
+    (the first version aggregated by option and would have let this kind of error through). Its first run immediately hit the row in the Appendix C/D deviation table of internal QC ledger 《交付物清单》 (workspace-side, not part of the public release):
     the plan's original wording in that column is **the very deviation meant to be displayed**, so the exemption applies per **row** rather than globally per option
     (`tools/verify_plan_traceability.py::declared_doc_usages`); the control is in the same JSON's
     `exemption_is_line_scoped`. Current measured state: 43 options and 127 example invocations scanned, 0 unaccepted.
@@ -1026,7 +1026,7 @@ Also confirmed along the way: `--from-scores` reusing the already-written `score
     **registered, not modified**: RT-1 requires those five upstream files to be pure appends with the failure set
     identical item by item to baseline, and stuffing assertions into someone else's cases changes both behavior and
     line-number references. The declaration lives in the "pre-existing tests with missing assertions" section of
-    `docs/交付物清单.md`; the gate judges "scanned set ⊆ declared set" and conversely reports "old entries no longer
+    internal QC ledger 《交付物清单》 (workspace-side, not part of the public release); the gate judges "scanned set ⊆ declared set" and conversely reports "old entries no longer
     present in the declaration" — if the upstream is ever cleaned up, the declaration will be forced to update too.
     The process also left one self-correction behind: the regex parsing the declaration list was first written as
     `(test_\w+)::(test_\w+)`, could not recognize filenames with dots in them, and so the gate **judged FAIL first
@@ -1103,7 +1103,7 @@ Also confirmed along the way: `--from-scores` reusing the already-written `score
     called whom"**, following neither rebindings nor import aliases, and so judged the genuinely reachable
     `neoHGT/util.py::resolve_taxon_ref` as "unreachable" — and in Round 32 it was even **filed as a deviation**.
     After the traversal was fixed it is no longer an exception (the declaration shrank from 5 to 4, with the reason
-    written in `docs/交付物清单.md`), and the reverse falsification
+    written in internal QC ledger 《交付物清单》 (workspace-side, not part of the public release)), and the reverse falsification
     `neoHGT/tests/test_gtdb_pipeline.py::TestProductionReachability::test_a_wrapper_reached_only_through_a_rebinding_is_reachable`
     pins both directions at once: with the rebinding it must be reachable, and **with the rebinding removed it must
     become unreachable** (otherwise this falsification proves nothing). Lesson: **declaring "this is a deviation" is
@@ -1515,7 +1515,7 @@ Also confirmed along the way: `--from-scores` reusing the already-written `score
     "an exemption must have evidence" report. Four test cases pin these four situations (10 cases in `TestExternalWriteGate` in total);
     `tools/env.sh` exports both `PIP_CACHE_DIR` and `PIP_DISABLE_PIP_VERSION_CHECK`,
     so that any pip we start cannot write into `~/.cache` — the premise of the exemption is enforced, not assumed.
-    One upstream hazard registered along the way (written at the end of `docs/既有缺陷登记.md`, in the section "observations not in plan appendix F" — it **takes no F number**: appendix F's 14 items come from the plan, and the register gate judges any extra number in the table "not a plan number"; inventing a number is silently rewriting the plan): `neoHGT/server.py` runs `pip install requests` **at import time**;
+    One upstream hazard registered along the way (written at the end of internal QC ledger 《既有缺陷登记》 (workspace-side, not part of the public release), in the section "observations not in plan appendix F" — it **takes no F number**: appendix F's 14 items come from the plan, and the register gate judges any extra number in the table "not a plan number"; inventing a number is silently rewriting the plan): `neoHGT/server.py` runs `pip install requests` **at import time**;
     measurement showed this project (including test cases, gates, and CI) has no importer of it, and this round did not change it (changing it would delete upstream lines).
 
 
@@ -1578,11 +1578,11 @@ Also confirmed along the way: `--from-scores` reusing the already-written `score
     so those three reads never execute; `precomp` really does get there, yet `--queries/--maxchars/--extrargs`
     are used by no one on that route (160-161 reads the whole table in batch; 412-414 forces self-comparison to the built-in method;
     in the only place that would use them, "batch native self-comparison", `self.method != 'precomp'` is always true —
-    a dead branch left by upstream, already recorded in `docs/既有缺陷登记.md` as an "observation item outside appendix F").
+    a dead branch left by upstream, already recorded in internal QC ledger 《既有缺陷登记》 (workspace-side, not part of the public release) as an "observation item outside appendix F").
     So this round did two things. On the product side, `guard_precomp_knobs()` explicitly rejects those three options on the GTDB route
     (the rejection message names every one; values "with the same behavior on this route" such as `--queries 0`/`--maxchars 0` are not rejected).
     On the gate side, a new **rule 23**, `dynamic_section_problems`: if a section name chosen by value has no corresponding
-    config.yml section, a disposition line must be written in `docs/交付物清单.md`, and the gate verifies that disposition line in the code:
+    config.yml section, a disposition line must be written in internal QC ledger 《交付物清单》 (workspace-side, not part of the public release), and the gate verifies that disposition line in the code:
     "reject" must still be a single `raise` naming every rejected option; "normalize" must still be a single
     `if self.<属性> == <取值>` whose taken branch rewrites it on all paths, with nobody assigning it back before the read point.
     Two red-light records are archived: `R54_register_before_ledger.json` (5 problems: 3 entry strings + 2 undeclared),
@@ -1592,7 +1592,7 @@ Also confirmed along the way: `--from-scores` reusing the already-written `score
     rejection message, and the rule must go red again).
 
 40. **I added a table to the ledger, and only then discovered that "what the ledger is" was decided by column count (Round 54).**
-    After rule 23's disposition table was written into `docs/交付物清单.md`, the register gate immediately reported seven
+    After rule 23's disposition table was written into internal QC ledger 《交付物清单》 (workspace-side, not part of the public release), the register gate immediately reported seven
     "`auto` in the deliverables table is not a plan number". Digging in, the table was not written wrong — rather, `ledger_rows()`
     treats **every** `|` row of 4 or more columns in the document as a ledger row; the three prose tables before this
     (command-form deviations, appendix B symbols, §10.1 fixture coverage points) escaped misreading
@@ -1602,7 +1602,7 @@ Also confirmed along the way: `--from-scores` reusing the already-written `score
     Identification now goes by the header: only a table whose first cell reads `编号` or `ID` is the ledger,
     and prose gaps do **not** interrupt the ledger (in the test case, the table keeps listing rows after a heading — this must still hold).
     Three cases lock both directions: a wide prose table stays out of the population, ledger rows across prose remain,
-    and the shipped `交付物清单.md` reads out exactly D1–D12 with no ghost rows.
+    and the shipped internal QC ledger 《交付物清单》 reads out exactly D1–D12 with no ghost rows.
 
 41. **Two rounds in a row had headings deleted by the same action; this time it became a machine criterion (Round 54).**
     In Round 53 I accidentally deleted a `###` subsection heading in `docs/GTDB-数据库.md` (recorded in §66's process ledger),
@@ -1705,7 +1705,7 @@ Also confirmed along the way: `--from-scores` reusing the already-written `score
     not while writing it — **the channel that writes documentation must also be treated as "review first, then execute"**.
 46. **A new rule can kill itself: writing tool names into the very table the gate reads (Round 56).**
     After the collection surface of the "checker tools nobody runs will rot" rule was widened from `verify_*.py` to `tools/*.sh`,
-    I casually listed four names in backticks in the "checker tools no one runs automatically" section of `docs/交付物清单.md` —
+    I casually listed four names in backticks in the "checker tools no one runs automatically" section of internal QC ledger 《交付物清单》 (workspace-side, not part of the public release) —
     `run.sh`, `env.sh`, `round_witness.sh`, `gate_round_witness.sh` — and wrote down their runners.
     The backticked names in that section **are** the gate's declaration set: that note was tantamount to telling the rule "these four are supposed to be run by no one",
     dissolving on the spot the protection I had just built — and it would make the gate "greener", so any self-check that takes green as the criterion would never find it.
