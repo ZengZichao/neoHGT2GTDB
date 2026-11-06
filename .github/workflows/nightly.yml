@@ -1,9 +1,9 @@
 name: Nightly benchmarks
 
-# Non-blocking resource report (plan §10.6): the full R232 build costs more
-# than 8 h, so it is not a pull-request gate. These jobs measure the tiers that
-# can run in CI and record wall clock, peak RSS and disk for each artifact.
-# Nothing here is allowed to write outside the runner workspace.
+# Non-blocking resource report. A full GTDB build can take many hours, so it
+# is not a pull-request gate. These jobs measure the tiers that can run in CI
+# and record wall clock, peak RSS and disk for each artifact. Nothing here is
+# allowed to write outside the runner workspace.
 
 on:
   schedule:
@@ -37,7 +37,7 @@ jobs:
           python -m pip install --no-deps -e .
           python -m pip install pytest
 
-      - name: Taxonomy conversion (IT-1 equivalent)
+      - name: Taxonomy conversion benchmark
         shell: bash -el {0}
         run: |
           mkdir -p reports
@@ -48,7 +48,7 @@ jobs:
         env:
           GTDB_DIR: ${{ vars.GTDB_DIR }}
 
-      - name: Fastest tier build (IT-2b equivalent)
+      - name: Fastest tier build benchmark
         shell: bash -el {0}
         run: |
           mkdir -p reports
@@ -65,7 +65,7 @@ jobs:
         env:
           GTDB_DIR: ${{ vars.GTDB_DIR }}
 
-      - name: Memory slope of the NCBI extraction (P7-5)
+      - name: Memory slope of the NCBI extraction
         shell: bash -el {0}
         run: |
           mkdir -p reports
@@ -85,7 +85,7 @@ jobs:
           done
           cat reports/stream_*.txt || true
 
-      - name: Dataset consistency audit (DoD-2 mismatch lists)
+      - name: Dataset consistency audit
         shell: bash -el {0}
         env:
           GTDB_DIR: ${{ vars.GTDB_DIR }}
@@ -120,25 +120,21 @@ jobs:
             echo "GTDB_DIR not provided; nothing to check"
             exit 0
           fi
-          # One implementation, not a second weaker copy: the same checker the
-          # round gates run. It counts entries and reports what changed rather
-          # than stopping at the first hit.
+          # Counts entries and reports what changed rather than stopping at
+          # the first modified file.
           python tools/verify_read_only.py --dir "$GTDB_DIR" \
             --since "$(date -u -d '-2 hours' +'%Y-%m-%d %H:%M:%S')" \
             --out reports/nightly_read_only.txt
 
-      - name: Register gate against the live plan
+      - name: Register gate against a local plan file
         shell: bash -el {0}
         env:
           PLAN_PATH: ${{ vars.PLAN_PATH }}
         run: |
-          # The pull-request job already gates the seven registers, but only
-          # against the frozen plan-id digest -- the plan file itself is not in
-          # this repository, so two things go unchecked there: the citations that
-          # only the plan can settle, and the plan's OWN command examples. This
-          # step runs the same gate with --plan when the runner has the file.
-          # Without PLAN_PATH the tool reports `not checked (no --plan)` and this
-          # step says so out loud -- an unjudged plan must not read as a clean one.
+          # The pull-request job checks the frozen plan-id digest. When a local
+          # plan file is available, this step also checks the plan's own command
+          # examples and citations. Without PLAN_PATH the tool reports
+          # `not checked (no --plan)` and this step says so explicitly.
           if [ -z "${PLAN_PATH:-}" ] || [ ! -f "${PLAN_PATH:-}" ]; then
             echo "NOTE: PLAN_PATH not provided; the plan's own examples are NOT checked"
           fi

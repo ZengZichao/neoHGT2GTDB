@@ -1,0 +1,42 @@
+cff-version: 1.2.0
+message: "If you use neoHGT2GTDB, cite the upstream neoHGT work listed below and this repository."
+title: "neoHGT2GTDB: GTDB-adapted horizontal gene transfer detection"
+version: "2.0b3+gtdb1"
+date-released: "2026-11-06"
+license: BSD-3-Clause
+repository-code: "https://github.com/ZengZichao/neoHGT2GTDB"
+authors:
+  - family-names: "Zeng"
+    given-names: "Zichao"
+    orcid: "https://orcid.org/0000-0001-6553-970X"
+  - family-names: "Li"
+    given-names: "Zhihui"
+  - family-names: "Zhu"
+    given-names: "Qiyun"
+  - family-names: "Dittmar"
+    given-names: "Katharina"
+preferred-citation:
+  type: article
+  title: "Bacterial origins of thymidylate metabolism in Asgard Archaea and Eukarya"
+  authors:
+    - family-names: "Filée"
+      given-names: "J."
+    - family-names: "Becker"
+      given-names: "H. F."
+    - family-names: "Mellottee"
+      given-names: "L."
+    - family-names: "Eddine"
+      given-names: "R. Z."
+    - family-names: "Li"
+      given-names: "Z."
+    - family-names: "Yin"
+      given-names: "W."
+    - family-names: "Lambry"
+      given-names: "J.-C."
+    - family-names: "Liebl"
+      given-names: "U."
+    - family-names: "Myllykallio"
+      given-names: "H."
+  doi: "10.1038/s41467-023-36487-z"
+  journal: "Nature Communications"
+  year: 2023

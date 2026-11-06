@@ -8,7 +8,7 @@
 │			ingestion channels used by "neoHGT database --source gtdb".
 │
 │	=======================================================
-│	Copyright:	Distributed under the terms of the Modified BSD License.
+│	Copyright:	Distributed under the terms of the BSD 3-Clause License.
 │
 ////////////////////////////////////////////////////////////
 """
@@ -41,32 +41,30 @@ from neoHGT.util import (
 
 
 # ---------------------------------------------------------------------------
-# Constants (implementation contract, see plan §3.3 and §5.3)
+# Constants
 # ---------------------------------------------------------------------------
 
-SERIAL_ANCHOR = '_SerialNumber_'          # local protein-Id anchor (§3.3d)
-STEM_ANCHOR_RE = re.compile(r'_(d|p|c|o|f|g)_')
+SERIAL_ANCHOR = '_SerialNumber_'          # local protein-Id anchor
+STEM_RANK_ANCHORS = ('d', 'p', 'c', 'o', 'f', 'g')
+STEM_ANCHOR_RE = re.compile(
+    '_(' + '|'.join(STEM_RANK_ANCHORS) + ')_')
 LOCAL_LAYOUTS = ('local-renamed', 'official-plain', 'official-gz')
 # Layout label written by builds made before the label stopped encoding a
 # release number; still accepted everywhere a renamed layout is expected.
 LEGACY_RENAMED_LAYOUT = 'gtdb-r220-renamed'
-# Start of the reserved GTDB taxId range. Plan ADR-2 proposed 1e9, but spike
-# S1 measured that DIAMOND sizes db.dmnd by the highest taxId value, not by the
-# number of nodes: the same 13 MB test database became 5.7 GB at 1e9 and 620 MB
-# at 1e8. 1e8 keeps a ~25x margin over the largest NCBI taxId measured in the
-# reference dumps this project sees (3,905,377 in a 2026 r220-era dump; the
-# "~3.4e6" figure quoted by the first comment revision is stale). Re-measure on
-# every release: if NCBI crosses 1e7 the whole synthetic range must move.
+# Start of the reserved GTDB taxId range. DIAMOND sizes db.dmnd by the highest
+# taxId value, not by the number of nodes: a 13 MB test database became 5.7 GB
+# at 1e9 and 620 MB at 1e8. 1e8 keeps a wide margin over the largest NCBI taxId
+# in current dumps. Re-check the margin for every release.
 DEFAULT_ID_BASE = 100_000_000
-MIN_SAFE_ID_BASE = 10_000_000              # re-check against real dumps per release
+MIN_SAFE_ID_BASE = 10_000_000
 
 
 def tool_version():
     """Version string recorded in meta.json / provenance lines.
 
     Reads the package version so the fork identity cannot drift from
-    neoHGT.__version__ (two hardcoded literals used to say '2.0b3+gtdb1'
-    while the package still said '2.0b3').
+    neoHGT.__version__.
     """
     try:
         from neoHGT import __version__ as v
@@ -300,14 +298,21 @@ def guard_write(path, root=None, must_not_contain=None):
         raise GuardError(
             'No output path given: pass -o/--output explicitly (got '
             f'{path!r}).')
+    real = realpath(raw)
+    if must_not_contain:
+        inp = realpath(expand(must_not_contain))
+        if is_within(real, inp):
+            raise GuardError(
+                f'Refusing to write "{real}": the GTDB input dataset at '
+                f'"{inp}" is read-only.')
     if root is None:
         root = workspace_root()
         if root is None:
             print('  NOTE: no workspace root is configured (set NEOHGT_ROOT '
                   'or source tools/env.sh); writes are not contained to a '
                   'workspace, but the read-only input dataset still is.')
+            return real
     root = realpath(root)
-    real = realpath(raw)
     # A symlinked output must not smuggle writes outside of the workspace.
     if not is_within(real, root):
         raise GuardError(
@@ -315,12 +320,6 @@ def guard_write(path, root=None, must_not_contain=None):
             f'"{root}". To write elsewhere, set NEOHGT_ROOT (or pass '
             '--workspace-out/--workspace-tmp on the database stage); writing '
             'into the read-only input dataset stays forbidden either way.')
-    if must_not_contain:
-        inp = realpath(expand(must_not_contain))
-        if is_within(real, inp):
-            raise GuardError(
-                f'Refusing to write "{real}": the GTDB input dataset at '
-                f'"{inp}" is read-only.')
     return real
 
 

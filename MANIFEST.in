@@ -1,0 +1,10 @@
+include README.md
+include README.zh-CN.md
+include CHANGELOG.md
+include CONTRIBUTING.md
+include CITATION.cff
+include LICENSE
+include MANIFEST.in
+recursive-include docs *.md *.json
+recursive-include ci *
+recursive-include tools *.py *.sh

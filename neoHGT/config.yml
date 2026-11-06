@@ -8,20 +8,20 @@
 # 2. home directory, under subdirectory ".neoHGT"
 # 3. program directory
 
-## Workspace layout (GTDB adaptation; plan §5.8)
-# All three directories must live inside one project root. neoHGT refuses to
-# write anywhere else, and never writes into the GTDB input dataset.
+## Workspace layout (optional)
+# A workspace is a convenience for keeping GTDB builds and scratch files in one
+# place. It is not required: when no workspace is configured, outputs may be
+# written anywhere, and only the read-only GTDB input dataset is protected.
 #
-# The shipped file deliberately carries NO machine paths: baked-in absolute
-# paths made every machine except the build author's fail on its first write
-# (and made the "workspace" a permission whitelist instead of a safety rule). Set the
-# environment variables instead -- tools/env.sh is the reference setup:
+# To enable it, set the workspace root (and optionally the scratch/cache
+# directories). tools/env.sh is the reference setup:
 #   NEOHGT_ROOT   workspace root that outputs must stay inside
 #   NEOHGT_TMP    scratch directory (defaults under NEOHGT_ROOT)
 #   NEOHGT_CACHE  cache/reports directory (defaults under NEOHGT_ROOT)
-# or override per run with --workspace-out / --workspace-tmp. With nothing set,
-# writes are not contained to a workspace (a NOTE says so once); the read-only
-# input dataset is never written to in either case.
+# The same values may be set here instead; command-line overrides
+# --workspace-out / --workspace-tmp take precedence for the database stage.
+# When a workspace root is set, every output must resolve inside it. The GTDB
+# input dataset is never written to, with or without a workspace.
 workspace:
   code_dir:
   tmp_dir:
@@ -36,7 +36,7 @@ database:
   source: ncbi
 
   # hybrid mode: a local GTDB copy ships no NCBI taxonomy, so a hybrid build
-  # needs an NCBI-style nodes.dmp/names.dmp directory of its own (plan §3.4).
+  # needs an NCBI-style nodes.dmp/names.dmp directory of its own.
   # Empty means unset; the code falls back to --hybrid-ncbi-taxdump and a
   # `--source hybrid` run refuses until one of the two names a directory.
   hybrid:
@@ -45,8 +45,7 @@ database:
   # GTDB data source settings (used when source is gtdb or hybrid)
   gtdb:
     # read-only local GTDB dataset root; empty means "take $GTDB_DIR, else
-    # require --gtdb-dir". The shipped default used to be one machine's mount
-    # point, which other installs could not have.
+    # require --gtdb-dir".
     dir:
     # release label; inferred from file names when "auto"
     release: auto
@@ -55,9 +54,9 @@ database:
     local_layout: auto
     # local | ncbi | gtdb-tar | ena (remote channels need --allow-network yes)
     seq_source: local
-    # first taxId of the reserved GTDB range; must not clash with NCBI taxIds
-    # (spike S1: db.dmnd grows with the highest taxId value, so 1e8 is ~9x
-    # smaller than 1e9 while still far above any real NCBI taxId)
+    # first taxId of the reserved GTDB range; must not clash with NCBI taxIds.
+    # DIAMOND sizes db.dmnd by the highest taxId value, so 1e8 is much smaller
+    # than 1e9 while still far above any real NCBI taxId.
     taxid_base: 100000000
     # run the input self-consistency checks and abort if any fails
     selfcheck: required
@@ -68,7 +67,7 @@ database:
     # (see neoHGT/search.py: set_params_gtdb). A key here would be inert.
     # genome quality filters are deliberately NOT applied from here: passing
     # them implicitly would make "--reps" genome counts disagree with the
-    # metadata representative totals that DoD-2 verifies. Opt in per build:
+    # metadata representative totals. Opt in per build:
     #   --min-completeness 50 --max-contamination 10
     # min_completeness: 50
     # max_contamination: 10

@@ -15,6 +15,7 @@
     "test_ids": 37,
     "verification": 36
   },
+  "generated_by": "tools/verify_plan_traceability.py --emit-ids",
   "generated_utc": "2026-11-02 11:45:47",
   "inventory": {
     "appendix_b_symbols": [
@@ -411,5 +412,6 @@
       "RT-3"
     ]
   },
+  "schema_version": 1,
   "source": "neoHGT2.GTDB-ADAPTATION-PLAN-CHN.md"
 }

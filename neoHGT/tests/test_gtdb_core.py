@@ -406,6 +406,29 @@ class TestWorkspaceGuard(unittest.TestCase):
         os.environ['_NEOHGT_TEST_SUB'] = 'sub'
         self.assertEqual(gtdb.expand('/a/$_NEOHGT_TEST_SUB/b'), '/a/sub/b')
 
+    def test_without_a_workspace_writes_are_not_contained(self):
+        """No configured root must mean "anywhere", not a TypeError.
+
+        README promises that outputs may live anywhere unless NEOHGT_ROOT is
+        set; guard_write used to feed None to realpath() in exactly that case.
+        """
+        saved_env = {k: os.environ.pop(k, None)
+                     for k in ('NEOHGT_ROOT', 'NEOHGT_CODE')}
+        saved = gtdb.load_config_file
+        gtdb.load_config_file = lambda: {'workspace': {}}
+        d = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, d, ignore_errors=True)
+        try:
+            out = gtdb.guard_write(join(d, 'output'))
+            self.assertEqual(out, os.path.realpath(join(d, 'output')))
+            with self.assertRaises(gtdb.GuardError):
+                gtdb.guard_write(join(d, 'input', 'x'), must_not_contain=join(d, 'input'))
+        finally:
+            gtdb.load_config_file = saved
+            for k, v in saved_env.items():
+                if v is not None:
+                    os.environ[k] = v
+
 
 if __name__ == '__main__':
     unittest.main()

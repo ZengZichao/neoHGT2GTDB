@@ -28,6 +28,10 @@ def _bootstrap():
     for var, sub in (('NEOHGT_CACHE', 'cache'), ('NEOHGT_TMP', 'tmp')):
         if not os.environ.get(var):
             os.environ[var] = os.path.join(root, sub)
+        # the helper and the guard both expect these to exist; creating them
+        # here keeps the scratch tree inside the workspace even when the host
+        # already exports TMPDIR
+        os.makedirs(os.environ[var], exist_ok=True)
     if not os.environ.get('TMPDIR'):
         # keep pytest temp dirs inside the workspace so guard_write sees them
         tmp = os.path.join(os.environ['NEOHGT_TMP'], 'build')

@@ -392,16 +392,11 @@ def appendix_b_problems(symbols, code_dir, ledger):
         with open(join(pkg, name), encoding='utf-8') as f:
             sources[join(code_dir, 'neoHGT', name)] = f.read()
     declared = set()
-    if not ledger or not isfile(ledger if os.path.isabs(ledger) else join(code_dir, ledger)):
-        # internal QC registers are workspace-side (see check_ledger); without
-        # the deviation table the symbol cross-check cannot run
-        return []
-    path = ledger if os.path.isabs(ledger) else join(code_dir, ledger)
-    if not isfile(path):
-        # internal QC registers are workspace-side (see check_ledger); without
-        # the deviation table the symbol cross-check cannot run
-        return []
-    if isfile(path):
+    # The deviation table is workspace-side, but the symbol existence check does
+    # not need it: a missing symbol is reported even when no ledger is present.
+    path = (ledger if ledger and os.path.isabs(ledger)
+            else join(code_dir, ledger) if ledger else None)
+    if path and isfile(path):
         with open(path, encoding='utf-8') as f:
             text = f.read()
         sect = doc_section(text, '附录 B 符号偏差')
@@ -1776,6 +1771,16 @@ def declared_vacuous_tests(ledger):
             re.finditer(r'`([\w.]+\.py)::(test_\w+)`', sect)}
 
 
+def public_vacuous_tests(code_dir):
+    """Public declaration of upstream tests kept without assertions."""
+    path = join(code_dir, 'docs', 'test-exceptions.json')
+    if not isfile(path):
+        return set()
+    with open(path, encoding='utf-8') as f:
+        data = json.load(f)
+    return set(data.get('tests') or [])
+
+
 # --- reuse route (--from-scores) option reachability ------------------------
 # `--from-scores` jumps from argument validation to prediction. Any option whose
 # only consumer lives in a skipped step is parsed, validated, and then cannot
@@ -2407,8 +2412,10 @@ def plan_inventory(plan_text):
 def write_inventory(path, plan_text, plan_name):
     """Freeze plan_inventory() to a committed digest."""
     import time
-    data = {'source': basename(str(plan_name)),
+    data = {'schema_version': 1,
+            'source': basename(str(plan_name)),
             'generated_utc': time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime()),
+            'generated_by': 'tools/verify_plan_traceability.py --emit-ids',
             'counts': {}, 'inventory': plan_inventory(plan_text)}
     for k, v in data['inventory'].items():
         data['counts'][k] = len(v)
@@ -2496,9 +2503,9 @@ ROUTE_CLAIMS = {
     'taxonomy.unique': ('search', 'arg2bool', 'tax_unique',
                         'arg2bool() over (tax_unique, tax_capital, tax_latin), search.py args_wf'),
     'fetch.queries': ('search', 'coerce_fetch_counts', 'fetch_queries',
-                      'coerce_fetch_counts() in the GTDB region of search.py (round 46: this was a real TypeError, now converted)'),
+                      'coerce_fetch_counts() in search.py'),
     'fetch.retries': ('search', 'coerce_fetch_counts', 'fetch_retries',
-                      'coerce_fetch_counts() in the GTDB region of search.py (round 46: this was a real TypeError, now converted)'),
+                      'coerce_fetch_counts() in search.py'),
 }
 # Which claims rest on an executed test instead of a line order, and which test.
 ROUTE_ORDER_PROOF = {
@@ -2903,10 +2910,20 @@ def route_ledger_emit(code_dir, out_path):
             records[entry].setdefault('expansion_basis', basis)
         if module not in records[entry]['modules']:
             records[entry]['modules'].append(module)
-    ledger = {'generated_from': code_dir,
+    for entry, rec in records.items():
+        if rec.get('divergent') and entry in ROUTE_CLAIMS:
+            rec['neutralizer'] = ROUTE_CLAIMS[entry][3]
+            rec['reason'] = ('the CLI and configuration routes hand over '
+                             'different Python types; the named neutralizer '
+                             'converts them before use')
+    ledger = {'schema_version': 1,
+              'generated_from': 'neoHGT2GTDB',
+              'generated_utc': __import__('time').strftime(
+                  '%Y-%m-%d %H:%M:%S', __import__('time').gmtime()),
+              'generated_by': 'tools/verify_plan_traceability.py --emit-route',
               'note': ('one record per config key the stage modules read; a key '
                        'whose two routes hand over different objects needs a '
-                       'converter or a named neutralizer (register rule 19)'),
+                       'converter or a named neutralizer'),
               'unresolved_call_sites': unresolved,
               'keys': records}
     with open(out_path, 'w', encoding='utf-8') as fh:
@@ -4239,7 +4256,7 @@ def main():
     report['checker_tools_declared'] = checker_declared
     # a test that asserts nothing is a green light with no information in it
     vacuous = assertion_free_tests(args.code)
-    declared_vac = declared_vacuous_tests(doc)
+    declared_vac = declared_vacuous_tests(doc) | public_vacuous_tests(args.code)
     undeclared_vac = [x for x in vacuous if x not in declared_vac]
     if not qc_absent:
         task_problems += [

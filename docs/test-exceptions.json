@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "note": "Pre-existing upstream tests that exercise code but contain no assertion. They are kept unchanged under the append-only compatibility policy; new tests must assert.",
+  "tests": [
+    "test_analyze.py::test_density_func",
+    "test_database.py::test___call__",
+    "test_database.py::test_connect_server",
+    "test_database.py::test_download_genomes",
+    "test_database.py::test_extract_genomes",
+    "test_database.py::test_retrieve_categories",
+    "test_database.py::test_retrieve_summary",
+    "test_database.py::test_retrieve_taxdump",
+    "test_database.py::test_set_parameters",
+    "test_search.py::test___call__",
+    "test_search.py::test_args_wf",
+    "test_search.py::test_input_wf"
+  ]
+}

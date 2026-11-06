@@ -1,5 +1,5 @@
 {
- "generated_from": "neoHGT2GTDB-项目代码",
+ "generated_from": "neoHGT2GTDB",
  "baseline": "neoHGT-main",
  "functions": [
   "GenomeFetch.__getattr__",
@@ -348,5 +348,8 @@
  "counts": {
   "added": 211,
   "upstream": 129
- }
+ },
+ "schema_version": 1,
+ "generated_utc": "2026-11-06 07:34:57",
+ "generated_by": "tools/verify_production_reachability.py --emit-added"
 }

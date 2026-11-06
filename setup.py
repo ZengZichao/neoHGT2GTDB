@@ -7,16 +7,40 @@
 │	
 │	=======================================================
 │	Authorship:	Zhihui Li (Qiyun Zhu and Katharina Dittmar)
-│	Copyright:	Distributed under the terms of the Modified BSD License.
+│	Copyright:	Distributed under the terms of the BSD 3-Clause License.
 │	
 ////////////////////////////////////////////////////////////
 """
 #!/usr/bin/env python3
 
+import re
 from setuptools import setup, find_packages
 from glob import glob
 
 import neoHGT.__init__ as init
+
+
+REPO_URL = 'https://github.com/ZengZichao/neoHGT2GTDB'
+BLOB_URL = f'{REPO_URL}/blob/main'
+
+
+def long_description():
+    """README text with relative links rewritten for the PyPI page.
+
+    PyPI renders the README outside the repository, so a link such as
+    `docs/GTDB-数据库.md` would resolve against pypi.org. Rewriting the few
+    repository-relative targets to absolute GitHub URLs keeps the package page
+    navigable; the repository copy keeps using relative links.
+    """
+    with open('README.md', encoding='utf-8') as fh:
+        text = fh.read()
+    targets = (
+        'README.zh-CN.md', 'CHANGELOG.md', 'CONTRIBUTING.md', 'LICENSE',
+    )
+    for name in targets:
+        text = text.replace(f']({name})', f']({BLOB_URL}/{name})')
+    text = re.sub(r'\]\((docs/[^)]+)\)', rf']({BLOB_URL}/\1)', text)
+    return text
 
 
 classes = """
@@ -34,23 +58,24 @@ classes = """
 
 params = {
     # the distribution carries this repository's name (neoHGT2GTDB); the import
-    # package and the command it installs stay `neoHGT` -- see the README's
-    # "Naming, in one place" paragraph
+    # package and the command it installs stay `neoHGT`
     'name':             'neoHGT2GTDB',
     'version':          init.__version__,
     'license':          init.__license__,
     'description':      init.__description__,
-    'long_description': open('README.md').read(),
+    'long_description': long_description(),
     'long_description_content_type': 'text/markdown',
     'author':           init.__author__,
-    # maintainer of this adaptation; `author` credits the upstream code
-    # authorship, whose personal address is deliberately not published
     'maintainer':       '曾子超 (Zeng Zichao)',
     'maintainer_email': init.__email__,
-    # unofficial derivative: no homepage of its own is claimed; the upstream
-    # project is linked for attribution only
-    'project_urls':     {'Upstream project (official neoHGT2)': init.__url__,
-                         'Maintainer ORCID': 'https://orcid.org/0000-0001-6553-970X'},
+    'url':              REPO_URL,
+    'project_urls':     {
+        'Source': REPO_URL,
+        'Documentation': f'{REPO_URL}#documentation',
+        'Changelog': f'{BLOB_URL}/CHANGELOG.md',
+        'Upstream project (official neoHGT2)': init.__url__,
+        'Maintainer ORCID': 'https://orcid.org/0000-0001-6553-970X',
+    },
     'install_requires': ['pyyaml',
                          'numpy',
                          'scipy',
@@ -59,13 +84,9 @@ params = {
                          'matplotlib'],
     'classifiers':      classes.strip().split('\n    '),
     'python_requires':  '>=3.6',
-    # entry_points used to be the orphan string '[console_scripts]' (upstream
-    # inheritance), which setuptools ignored; the command comes from `scripts=`
     'scripts':          glob(f'scripts/{init.__name__}'),
     'package_data':     {init.__name__: ['config.yml']},
     'include_package_data': True
 }
 
-# the test tree ships fixture-independent code but depends on data files the
-# wheel does not carry: installed dead tests only confuse users (B 12.3)
 setup(**params, packages=find_packages(exclude=['neoHGT.tests*']))

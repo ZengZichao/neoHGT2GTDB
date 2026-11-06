@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "note": "Public helper API kept for library users and tests; these functions are not reachable from a CLI path by design.",
+  "functions": [
+    "gtdb_product",
+    "rank_order",
+    "rank_plural_label",
+    "rank_prefix"
+  ]
+}

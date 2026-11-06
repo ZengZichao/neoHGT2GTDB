@@ -1,176 +1,263 @@
-[English](README.md)(主)| **简体中文**(与英文版内容对照)
+[English](README.md)（主）| **简体中文**
 
 
 # neoHGT2GTDB: 🧬 基于 GTDB 参考框架的水平基因转移
 
-> **这不是官方的 neoHGT / neoHGT2。** neoHGT2GTDB 是 [neoHGT2](https://github.com/cgneo/neoHGT) 的一个独立、非官方的适配版本，在本仓库中维护。它未经上游作者或 [Qiyun lab](https://github.com/qiyunlab) 的认可，与其没有任何隶属关系，也不受其支持。官方项目仍位于 [cgneo/neoHGT](https://github.com/cgneo/neoHGT)；此处不使用任何官方 logo 或品牌标识。
+> **这不是官方的 neoHGT / neoHGT2。** neoHGT2GTDB 是 [neoHGT2](https://github.com/cgneo/neoHGT) 的一个独立、非官方适配版本，在本仓库中维护。它未经上游作者或 [Qiyun lab](https://github.com/qiyunlab) 的认可，与其没有任何隶属关系，也不受其支持。官方项目仍位于 [cgneo/neoHGT](https://github.com/cgneo/neoHGT)；此处不使用任何官方 logo 或品牌标识。
 
-**neoHGT2GTDB** 是对 [neoHGT2](https://github.com/cgneo/neoHGT) 的一次深入、以 GTDB 为核心的适配。它原样保留了上游项目——NCBI 路线、多进程数据库下载器、搜索与分析流水线——并在此基础上添加了一条完整的 GTDB 路线：由本地只读的 [GTDB](https://gtdb.ecogenomic.org/) 发行版（已在 R09-RS220 上验证）构建的参考数据库、记录在只追加清单中的合成 taxId、GTDB 风格的阶元与供体标签、可选的 NCBI+GTDB 混合树，以及为上述一切而设的机器校验文档/测试门禁。
+**neoHGT2GTDB** 是对 [neoHGT2](https://github.com/cgneo/neoHGT) 的 GTDB 适配。它保留上游的 NCBI 路线、数据库下载器、搜索与分析流水线，并新增 GTDB 路线：由本地只读 [GTDB](https://gtdb.ecogenomic.org/) 发行版构建参考数据库、记录在只追加清单中的合成 taxId、GTDB 阶元与供体标签，以及可选的 NCBI+GTDB 混合树。GTDB 路线已在本地 R09-RS220 副本上完成端到端运行；官方平铺布局尚未通过完整建库验证（见 [GTDB 数据库（实验性）](#gtdb-数据库实验性)）。
 
-命令行入口点仍是 `neoHGT`，继承自上游，因此既有的 neoHGT/neoHGT2 脚本可以继续工作；GTDB 方面的新增内容位于 `gtdb` 子命令实用工具以及新的 `--source gtdb|--hybrid` 数据库选项中（参见 [GTDB 数据库（实验性）](#gtdb-数据库实验性)）。
+命令行入口仍是 `neoHGT`，继承自上游，因此既有的 neoHGT/neoHGT2 脚本可以继续工作。GTDB 新增功能位于 `gtdb` 工具子命令和新的 `--source gtdb|hybrid` 数据库选项中。
 
-**命名，在此一次说清：** *仓库* 和 *pip 发行包* 的名字是 **neoHGT2GTDB**；*导入包* 和 *命令* 仍为 `neoHGT`。这是一个深思熟虑的兼容性选择：每一个文档示例、既有的 neoHGT/neoHGT2 脚本以及机器校验的文档门禁都固定使用上游的拼写，重命名可执行文件只会破坏这一切而不会带来任何好处。因此 `pip install .` 会安装一个名为 `neoHGT2GTDB` 的发行包，它提供 `neoHGT` 命令和 `neoHGT` 包。
+**命名说明：** *仓库*和 *pip 发行包*名为 **neoHGT2GTDB**；*导入包*和 *命令*仍为 `neoHGT`。这是兼容性选择：文档示例和既有脚本都使用上游拼写。`pip install .` 会安装名为 `neoHGT2GTDB` 的发行包，它提供 `neoHGT` 命令和 `neoHGT` 包。
 
-项目沿革：[HGTector](https://github.com/qiyunlab/HGTector) → neoHGT (v1) → [neoHGT2](https://github.com/cgneo/neoHGT) → **neoHGT2GTDB**（本仓库）。如果你有兴趣复现[论文](https://www.nature.com/articles/s41467-023-36487-z)中的结果，前一版本 neoHGT1 仍可在[这里](https://github.com/cgneo/neoHGT-v1)找到。继承自 neoHGT2 的 NCBI 路线中的 bug 最好报告到[上游的 issue 跟踪器](https://github.com/cgneo/neoHGT/issues)；GTDB 适配中的 bug 则应报告到本仓库的 issue 跟踪器，欢迎合作者加入。
+项目沿革：[HGTector](https://github.com/qiyunlab/HGTector) → neoHGT (v1) → [neoHGT2](https://github.com/cgneo/neoHGT) → **neoHGT2GTDB**（本仓库）。如果你有兴趣复现[论文](https://www.nature.com/articles/s41467-023-36487-z)中的结果，前一版本 neoHGT1 仍可在[这里](https://github.com/cgneo/neoHGT-v1)找到。继承自 neoHGT2 的 NCBI 路线问题最好报告到[上游 issue 跟踪器](https://github.com/cgneo/neoHGT/issues)；GTDB 适配中的问题应报告到本仓库的 issue 跟踪器，欢迎合作者加入。
 
 ## 目录
+
 1. [关于](#关于)
 2. [安装](#安装)
-3. [数据库](#数据库)
-4. [编译](#编译)
-5. [GTDB 数据库（实验性）](#gtdb-数据库实验性)
+3. [GTDB 数据库（实验性）](#gtdb-数据库实验性)
+4. [NCBI 数据库](#ncbi-数据库)
+5. [编译](#编译)
 6. [搜索](#搜索)
 7. [分析](#分析)
-8. [卸载](#卸载)
-9. [许可证](#许可证)
+8. [文档](#文档)
+9. [卸载](#卸载)
+10. [发表文献](#发表文献)
+11. [文献引用](#文献引用)
+12. [许可证](#许可证)
 
 ## 关于
-**neoHGT2GTDB** 为感兴趣的物种预测水平/侧向基因转移（HGT）。与它所源自的上游 [neoHGT](https://github.com/cgneo/neoHGT) 项目一样，它基于 Qiyun lab 开发的 [HGTector](https://github.com/qiyunlab/HGTector)——上游修复了 HGTector 的已知 bug，用多进程并行化了下载过程，并提升了整体稳定性。neoHGT2GTDB 自身添加的是 GTDB 路线：它在 GTDB 标准化、阶元完备的原核生物分类体系上重建参考框架（并带有可选的混合模式，把 NCBI 树的顶端嫁接到 GTDB 树上），这可度量地改善了 self/close/distal 分组的统计行为，并对该行为进行端到端的文档化和机器校验。
 
-  
+**neoHGT2GTDB** 为感兴趣的物种预测水平/侧向基因转移（HGT）。与上游 [neoHGT](https://github.com/cgneo/neoHGT) 项目一样，它基于 Qiyun lab 开发的 [HGTector](https://github.com/qiyunlab/HGTector)。GTDB 路线在 GTDB 标准化、阶元完备的原核生物分类体系上重建参考框架，并可选择把 NCBI 树的顶端嫁接到 GTDB 树上。GTDB 路线与 NCBI 路线的统计行为正面对照尚未完成；GTDB 指南给出了现有实测数字和每种数据集的适用范围。
 
 ## 安装
-本项目完全以 Python3 编写。<br>
-推荐安装方法：
+
+本项目完全以 Python 3 编写。
 
 第 1/3 步：
 
-```
+```sh
 conda create -n neoHGT -c conda-forge python=3 pyyaml pandas matplotlib scikit-learn
-```
-
-第 2/3 步：
-
-接下来，你需要手动安装 diamond，方法是访问 [conda 官方网页](https://anaconda.org/bioconda/diamond/files?version=0.9.26)。
-
-你会看到一个文件列表，请查看文件名的开头，它描述了操作系统。下载与你的系统相对应的那个文件后，你可以运行
-
-```
 conda activate neoHGT
 ```
+
+第 2/3 步：从 bioconda 安装 DIAMOND。GTDB 路线已用 DIAMOND 2.1.10 测试。
+
+```sh
+conda install -c bioconda diamond
+diamond version
 ```
-conda install <diamond___.tar.bz2>
-```
 
-然后接上你刚下载的文件（把文件拖到终端里），即可安装 diamond。
+第 3/3 步：安装本仓库。
 
-第 3/3 步：
-
-运行以下命令：
-
-```
+```sh
 conda activate neoHGT
-```
-```
 pip install .
 ```
 
-请在本（neoHGT2GTDB）仓库的克隆中运行此命令。若要改为安装上游项目，请使用 `pip install git+https://github.com/cgneo/neoHGT.git`。
+请在本仓库的克隆中运行。若要安装上游项目，请使用 `pip install git+https://github.com/cgneo/neoHGT.git`。
 
+## GTDB 数据库（实验性）
 
-## 数据库
+GTDB 路线直接从**本地只读 GTDB 发行版**构建参考数据库。工具不会下载任何内容：分类体系由 GTDB 的 `*_taxonomy_r220.tsv` 和 `*_metadata_r220.tsv` 转换而来，蛋白序列从每个基因组的 `.faa` 文件读取，每个合成 taxId 都记录在只追加清单中，使 ID 在多次重建之间保持稳定。
 
-与 HGTector 相比，本项目继承的 neoHGT2 下载器不仅修复了 HGTector 的一些已知 bug，还使用多进程实现并行下载，为你节省数据库下载过程的时间。
+### 环境
 
-neoHGT2GTDB 保留了上游的 ```server.py```，它无需图形用户界面即可下载并安装数据库。
+未配置工作区时，输出可以放在任何位置。设置 `NEOHGT_ROOT` 后，工具会拒绝写出该根目录之外；无论是否设置工作区，只读的 GTDB 输入都不会被写入。以下示例使用这些变量：
 
-```server.py``` 是**仅支持 NCBI** 的：它获取预构建的 `hgtdb_20230102`
-数据库，对 GTDB 一无所知。GTDB（或 `--source hybrid`）数据库要
-通过命令行构建——参见下文的
-[GTDB 数据库（实验性）](#gtdb-数据库实验性)。
-
-但推荐的方式是手动下载：
-
-## Option1（手动）
-### （最全面、最新但耗时）：
-
-首先，我们需要 ```taxonmap```，获取该文件有两种选择：
-
-下面的链接会得到一个更小、更紧凑的 ```taxdump```（解压后约 0.4GB）。你可以把链接粘贴到浏览器里开始下载：
+```sh
+export GTDB_DIR=/path/to/GTDB_r220
+export NEOHGT_ROOT=/path/to/workspace
+export NEOHGT_CACHE="$NEOHGT_ROOT/cache"
+export NEOHGT_TMP="$NEOHGT_ROOT/tmp"
 ```
+
+也可以加载项目自带的封装；它根据脚本自身位置推导代码目录：
+
+```sh
+export GTDB_DIR=/path/to/GTDB_r220
+. /path/to/neoHGT2GTDB/tools/env.sh
+```
+
+该封装还会读取 `tools/env.local`（被 git 忽略），用于机器特定路径。完整的环境与工作区说明见 [docs/GTDB-数据库.md](docs/GTDB-数据库.md)。
+
+### 快速开始
+
+```sh
+# 0) 只读预检：识别布局并执行数据集自洽核对。
+#    n_checks 随数据集变化；r220 参考副本为 19。
+neoHGT gtdb probe --dir "$GTDB_DIR" \
+  --out "$NEOHGT_CACHE/logs/layout_probe.json"
+
+# 1) 建库：古菌每科一个代表基因组（约 564 个基因组）
+neoHGT database --source gtdb --gtdb-dir "$GTDB_DIR" \
+  --rank-sample family --domain archaea --seq-source local \
+  --compile diamond --threads 16 \
+  -o "$NEOHGT_CACHE/db/ar_family"
+
+# 2) 搜索：DIAMOND 库已内嵌 GTDB taxId，staxids 直接可用
+diamond blastp --query sample.faa \
+  --db "$NEOHGT_CACHE/db/ar_family/diamond/db" --threads 16 \
+  --outfmt 6 qseqid sseqid pident evalue bitscore qcovhsp staxids \
+  --max-target-seqs 25 --sensitive -o hits.tsv
+neoHGT search -i sample.faa -m precomp -s hits.tsv \
+  -t "$NEOHGT_CACHE/db/ar_family/taxdump" \
+  -o "$NEOHGT_CACHE/search/sample"
+
+# 3) 分析：使用 GTDB 阶元与官方供体标签
+neoHGT analyze -i "$NEOHGT_CACHE/search/sample/sample.tsv" \
+  -t "$NEOHGT_CACHE/db/ar_family/taxdump" \
+  -o "$NEOHGT_CACHE/analyze/sample" \
+  --self-rank genus --donor-rank genus --donor-label prefixed \
+  --donor-ncbi-map yes
+```
+
+完整指南涵盖[数据准备](docs/GTDB-数据库.md#数据准备)、[probe](docs/GTDB-数据库.md#只读预检-probe)、[建库](docs/GTDB-数据库.md#建库-database)、[搜索](docs/GTDB-数据库.md#搜索-search)、[分析](docs/GTDB-数据库.md#分析-analyze)、[混合源](docs/GTDB-数据库.md#混合源-hybrid)、[资源预算](docs/GTDB-数据库.md#资源预算)和[故障排查](docs/GTDB-数据库.md#故障排查)。英文版见 [docs/en/GTDB-database.md](docs/en/GTDB-database.md)。
+
+### 与 NCBI 路线不同的行为
+
+- 远程分类信息获取被**强制关闭**（`--fetch-enable no`），因为合成 GTDB taxId 在 NCBI 没有记录。缺少 `staxids` 列的命中表会被拒绝（`--require-staxids` 默认 `yes`）；8 列标准 BLAST `outfmt 6` 表在 GTDB 模式下也会被拒收，因为它的 `qstart` 列会被读成 taxId。
+- `nodes.dmp` 使用 NCBI 阶元词汇（`domain` 存为 `superkingdom`）并写满 13 列，这是 `diamond makedb` 的要求；命令行上 `domain` 和 `superkingdom` 都可接受。
+- 供体以官方 GTDB 标签（`g__Halorubrum`）报告；`--donor-ncbi-map yes` 会写出 `hgts/<sample>.donor_ncbi.tsv`，离线地依据 metadata 的 `ncbi_taxid` 列把供体映射回 NCBI taxId。
+- `neoHGT gtdb reconcile` 对 metadata、GTDB taxonomy 和本地 `.faa` 索引做差分，并写出五张 accession 级差异列表（即使为空也写）。任何差异都会以非零状态退出。
+- `gtdb/` 下每个派生表都以 provenance 行开头：`# neoHGT version=…; gtdb_release=…; layout=…; generated=…`。`taxon.map.gz` 和 `genome.map.gz` 有意不带注释，因为 DIAMOND、BLAST 和 `read_prot2taxid` 会原样消费它们。
+- GTDB-Tk 输出可以用 `neoHGT gtdb gtdbtk` 转换为库内合成 taxId，结果可直接用于 `neoHGT analyze --input-tax`。
+- `neoHGT analyze --taxon-synonyms aliases.tsv`（`alias<TAB>current`）把 GTDB 旧名映射到当前名，作用于 `--self-tax`、`--close-tax`、`--tax-include`、`--tax-exclude` 和 `--input-tax`。
+- `--keep-placeholder-names`（默认 `yes`）保留 `g__DUMJ01` 这类官方编号标签；r220 有 1,658 个类群使用这类标签。
+- 在 GTDB 下，`-m precomp` 指向包含逐样本表的目录会被拒绝，因为上游循环会给每一批都喂第一张表。
+- `--expand-members yes` 把代表基因组扩展为物种簇成员，并写出 `gtdb/members.tsv.gz`。
+- `neoHGT gtdb tree-dist` 从发行版的逐阶元树计算 patristic 距离，并可用 `--db` 和 `--close-tax-out` 解析为合成 taxId。
+- `--stream-extraction yes`（仅 NCBI 路线；默认关闭）用磁盘支持的实现替换上游蛋白抽取：实测每百万蛋白 882 → 138 MB，抽取时间为 2.3 倍，每百万蛋白约 100 MiB 临时盘。
+- 以相同命令重新运行建库会复用 `db.faa` 和 `gtdb/extraction_state.json`，不会重复中断的抽取。
+- `neoHGT search` 以**追加**方式写 `<output>/<sample>.tsv`；每次运行请使用新的 `-o` 目录，或先移走旧表。
+- `db.dmnd` 随 taxId 的数值*范围*增长，因此 ID 基数默认 `100000000`（`--gtdb-taxid-base`，最小值 `10000000`）。
+- `--source hybrid` 把 NCBI 树的顶端嫁接到 GTDB 树上。`--hybrid-ncbi-taxdump` 指向 NCBI 的 `nodes.dmp`/`names.dmp`（必需），`--hybrid-lca-policy root|domain|refuse` 决定两个来源都认领的蛋白如何处置。合并树在内存和 `gtdb/lineages.tsv` 中保留真实阶元，而 `nodes.dmp` 会把 DIAMOND 词表之外的阶元折叠为 `no rank`。可搜索的序列仍然只有 GTDB 蛋白。
+- BLAST 路线**无法**用于 GTDB ID：`makeblastdb` 的本地 ID 上限为 50 字符，而 GTDB 序列 ID 为 151–270 字符。仅支持 DIAMOND。
+- `--keep-faa drop` 会在建库成功后**删除 `db.faa`**。如果需要保留序列，请使用 `--keep-faa compress`。
+
+### 不兼容的 CLI 缩写
+
+argparse 的前缀匹配意味着新的长选项可能让旧缩写变得有歧义。以下缩写现在会报 “ambiguous option”，必须写出完整长选项：
+
+| 子命令 | 现在失败的缩写 | 原先含义 |
+| --- | --- | --- |
+| `database` | `--a`、`--e`、`--geno`、`--l`、`--ra`/`--ran`、`--rep`、`--s`、`--ta`/`--tax`、`--ty`/`--typ`/`--type` | `--above`/`--latin`/`--genoids`/`--rank`/`--represent`/`--sample`/`--taxids`/`--typemater` 等 |
+| `search` | `--r`/`--re`、`--s` | `--retries`、`--server` |
+| `analyze` | `--t`/`--ta`/`--tax`、`--donor-n` | `--taxdump`、`--donor-name` |
+
+`--h`、`--k`、`--w` 也是新的歧义缩写，但此前没有对应的长选项含义。`--g`/`--ge`/`--gen` 在上游就已在 `--genbank` 和 `--genoids` 之间有歧义，不是本次适配造成的。
+
+### 实测开销
+
+R09-RS220，全集含 113,104 个代表基因组 / 333,384,550 个蛋白：
+
+| 层级 | 基因组数 | 蛋白数 | db.faa | db.dmnd | 墙钟时间 |
+| --- | --- | --- | --- | --- | --- |
+| 6 个基因组（冒烟） | 6 | 14,373 | 6.2 MB | 614 MB | ≈1 分钟 |
+| 科级抽样，古菌 | 564 | 905,829 | 360 MB | 985 MB | 2 分 37 秒 |
+| 一个科，`--reps` | 793 | 3,247,172 | 1.41 GiB | 2.07 GiB | 4 分 50 秒 |
+| 属级抽样，细菌 | 23,112 | 约 6,000–8,000 万 | 28–37 GB | 42–110 GB | 外推 |
+| 全部代表基因组集合 | 113,104 | 333,384,550 | 约 145 GiB | 约 1.5–3× db.faa | 抽取约 2–3 小时 + makedb 6–15 小时（外推） |
+
+`db.faa` 每个蛋白占用 **466 字节**（三档实测 455 / 417 / 466），磁盘预检按此值估算，并为 `makedb` 留出 3× 峰值系数。
+
+## NCBI 数据库
+
+与 HGTector 相比，本项目继承的 neoHGT2 下载器修复了 HGTector 的一些已知问题，并使用多进程并行下载。
+
+neoHGT2GTDB 保留上游的 `server.py`，它无需图形界面即可下载并安装数据库。
+
+`server.py` 是**仅支持 NCBI** 的：它获取预构建的 `hgtdb_20230102` 数据库，对 GTDB 一无所知。GTDB（或 `--source hybrid`）数据库要通过命令行构建；参见上文的 [GTDB 数据库（实验性）](#gtdb-数据库实验性)。
+
+推荐手动下载。
+
+### Option1（手动）
+
+#### （最全面、最新但耗时）
+
+首先需要 `taxonmap`。有两种选择：
+
+下面的链接会得到更小、更紧凑的 `taxdump`（解压后约 0.4 GB）。把链接粘贴到浏览器即可下载：
+
+```text
 https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.Z
 ```
 
-下面的链接会得到最新、更全面的 ```taxdump```（解压后约 1.8GB）：
+下面的链接会得到最新、更全面的 `taxdump`（解压后约 1.8 GB）：
 
-```
+```text
 https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/new_taxdump/new_taxdump.tar.Z
 ```
 
 ___
 
-接下来，我们需要 ```prot.accession2taxid```，它有两种选择：
+接下来需要 `prot.accession2taxid`。有两种选择：
 
-下面的链接会得到一个更小、更紧凑的 ```prot.accession2taxid```（约 7GB）。你可以把链接粘贴到浏览器里开始下载：
+下面的链接会得到更小、更紧凑的 `prot.accession2taxid`（约 7 GB）：
 
-```
+```text
 https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/accession2taxid/prot.accession2taxid.gz
 ```
 
-下面的链接会得到最新、更全面的 ```prot.accession2taxid```（约 12GB）：
+下面的链接会得到最新、更全面的 `prot.accession2taxid`（约 12 GB）：
 
-```
+```text
 https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/accession2taxid/prot.accession2taxid.FULL.gz
 ```
 
-## Option2（手动）：
-### （省时但不够全面、不够新）
+### Option2（手动）
 
-在[这个 OneDrive 链接](https://arizonastateu-my.sharepoint.com/personal/qzhu44_asurite_asu_edu/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fqzhu44%5Fasurite%5Fasu%5Fedu%2FDocuments%2FPublic%2FHGTector)上有一个预构建好的数据库，你只需下载最新的 ```hgtdb___.tar.xz``` 文件，即可跳过数据库编译步骤，直接跳到 [编译](#编译) 步骤。
+#### （省时但不够全面、不够新）
+
+[这个 OneDrive 链接](https://arizonastateu-my.sharepoint.com/personal/qzhu44_asurite_asu_edu/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fqzhu44%5Fasurite%5Fasu%5Fedu%2FDocuments%2FPublic%2FHGTector)上有一个预构建数据库。下载最新的 `hgtdb___.tar.xz` 文件后，可以跳过数据库下载与构建步骤，直接进入[编译](#编译)。
 
 ___
 
-## 数据库下载
+### 数据库下载
 
-在获得 ```taxonmap``` 和 ```prot.accession2taxid``` 之后，我们需要运行 ```neoHGT database``` 命令，下载约 291,000 个基因组文件来构建 diamond 数据库（~90GB），具体取决于你选择了多少个类别。
+获得 `taxonmap` 和 `prot.accession2taxid` 后，运行 `neoHGT database` 下载约 291,000 个基因组文件并构建 DIAMOND 数据库（约 90 GB），具体取决于所选类别。
 
-构建数据库的命令是：
-
-```
+```sh
 neoHGT database -c bacteria,archaea,viral -o <FOLDER_NAME>
 ```
 
-其中 ```-c``` 或等价的 ```-cats``` 表示类别。
-
-下表解释了可供你构建自定义数据库的命令和选项。
+`-c` 或 `--cats` 表示类别。下表说明自定义数据库的选项：
 
 | 命令 | 选项 |
 |---------|---------|
-| -c (-cats)      | archaea, bacteria, fungi, invertebrate, metagenomes, mitochondrion, plant, plasmid, plastid, protozoa, unknown, vertebrate_mammalian, vertebrate_other，以及 viral（源自 [NCBI RefSeq 数据库的文件夹名](https://ftp.ncbi.nlm.nih.gov/genomes/refseq/)） |
-| -o      | 输出数据库目录 |
+| -c (-cats) | archaea, bacteria, fungi, invertebrate, metagenomes, mitochondrion, plant, plasmid, plastid, protozoa, unknown, vertebrate_mammalian, vertebrate_other, 以及 viral（源自 [NCBI RefSeq 数据库的文件夹名](https://ftp.ncbi.nlm.nih.gov/genomes/refseq/)） |
+| -o | 输出数据库目录 |
 
 ___
 
-已知问题：
+已知问题：如果看到下面的错误，不要慌张：
 
-如果看到这条错误消息，不要慌张：
-```
-File "/Users/___/miniconda3/envs/neoHGT/lib/python3.11/site-packages/neoHGT/database.py", line 351, in get_categories
-    raise ValueError(
-ValueError: "___" is not a valid RefSeq genome category
+```text
+ValueError: "___" is not a valid refseq genome category
 ```
 
-出现这个错误，要么是你输入的类别名称有误（例如 NCBI 服务器上并不存在 ```virus``` 文件夹，你应该输入 ```viral```），要么是 NCBI 服务器暂时切断了与你的连接（拒绝了你的连接）。程序本身没有任何问题。
+出现这个错误，要么是类别名称有误（例如 NCBI 服务器上不存在 `virus` 文件夹，应使用 `viral`），要么是 NCBI 服务器暂时拒绝了连接。程序本身没有问题。
 
-遇到这个错误时，你能做的最好的事就是在终端输入以下命令来测试连接：
+用以下命令测试连接：
 
-```
+```sh
 rsync --list-only --no-motd rsync://ftp.ncbi.nlm.nih.gov/genomes/refseq/
 ```
 
-如果你看到类似 ```rsync: failed to connect to ftp.ncbi.nlm.nih.gov: Connection refused (61)
-rsync error: error in socket IO (code 10)``` 的输出，这就证实确实存在网络问题（很可能出在 NCBI 服务器一侧）。
+如果看到 `rsync: failed to connect to ftp.ncbi.nlm.nih.gov: Connection refused (61)` 和 `rsync error: error in socket IO (code 10)`，说明存在网络问题，很可能在 NCBI 一侧。如果命令返回以 `drwxr-sr-x` 开头、随后是 `lrwxrwxrwx` 等条目的列表，说明连接已恢复，可以重新运行程序。
 
-否则，如果前一条命令返回的列表以 ```drwxr-sr-x``` 开头，后面跟着类似 ```lrwxrwxrwx``` 的条目，就说明连接已恢复，你可以放心地再次执行程序。
+关于排除特定 taxId 等高级选项，请参考 HGTector 的[数据库](https://github.com/qiyunlab/HGTector/blob/master/doc/database.md)文档。
 
-关于更高级的选项（例如排除特定 taxid），请参考 HGTector 的[数据库](https://github.com/qiyunlab/HGTector/blob/master/doc/database.md)文档。
+当程序以以下输出结束时：
 
-看到程序以下面的输出结束时：
-```
+```text
 ✅ Done
 Combined protein sequences written to db.faa.
 ```
-即表示你可以继续进行手动编译。
+
+即可继续手动编译。
 
 ___
 
@@ -178,353 +265,154 @@ ___
 
 编译只使用 DIAMOND，因为它经过优化、速度更快。
 
-### 如果你按照 <b>Option1</b> 的说明操作：
+### 如果按照 Option1 操作
 
-```
+```sh
 cd <DATABASE_DIRECTORY>
-```
-
-```
 mkdir diamond
 ```
 
-然后，仔细地用你下载并解压好的文件替换 ```<‼️>``` 处的条目。确保这些文件都位于你的 ```<DATABASE_DIRECTORY>``` 的根文件夹下。下面为了清晰起见，命令被拆分成多行，但在实际操作中你应该保持为一行，不要按 ```return``` 键。
+用你下载并解压好的文件替换标记为 `<‼️>` 的条目。确保这些文件都位于 `<DATABASE_DIRECTORY>` 的根目录下。下面为了清晰起见把命令拆成多行，实际使用时请保持为一行。
 
-```
-diamond makedb --threads 64 --in db.faa
---taxonmap <‼️prot.accession2taxid.FULL>
---taxonnodes <‼️taxdump>/nodes.dmp
---taxonnames <‼️taxdump>/names.dmp
---db diamond/db
+```sh
+diamond makedb --threads 64 --in db.faa --taxonmap <‼️prot.accession2taxid.FULL> --taxonnodes <‼️taxdump>/nodes.dmp --taxonnames <‼️taxdump>/names.dmp --db diamond/db
 ```
 
-### 如果你按照 <b>Option2</b> 的说明操作：
+### 如果按照 Option2 操作
 
 第 1/2 步：
 
-```
+```sh
 cd <DATABASE_DIRECTORY>
 ```
 
-```
+```sh
 echo $'accession.version\ttaxid' | cat - <(zcat taxon.map.gz) > prot.accession2taxid.FULL
 ```
-在这一步，你可能会遇到一个奇怪的错误，例如 ```zcat: can't stat: taxon.map.gz (taxon.map.gz.Z): No such file or directory```。如果看到这个错误，只需把 ```taxon.map.gz``` 文件重命名为 ```taxon.map.gz.Z``` 即可。
+
+如果看到 `zcat: can't stat: taxon.map.gz (taxon.map.gz.Z): No such file or directory`，把 `taxon.map.gz` 重命名为 `taxon.map.gz.Z`。
 
 第 2/2 步：
 
-确保你仍在 ```<DATABASE_DIRECTORY>``` 中，然后输入以下命令：
-
-```
+```sh
 mkdir diamond
 ```
-```
+
+```sh
 diamond makedb --threads 64 --in db.faa --taxonmap prot.accession2taxid.FULL --taxonnodes taxdump/nodes.dmp --taxonnames taxdump/names.dmp --db diamond/db
 ```
 
-## GTDB 数据库（实验性）
-
-这是 neoHGT2GTDB 的核心，也是相对于 neoHGT2 的深层改进：
-除了继承自上游的 NCBI 路线之外，它还可以直接从**本地的只读 GTDB 发行版**（已在
-R09-RS220 上验证）构建参考数据库。什么都不会被下载：分类体系由 GTDB 自带的
-`*_taxonomy_r220.tsv` 加上
-`*_metadata_r220.tsv` 转换而来，蛋白序列从每个基因组的
-`.faa` 文件流式读取，并且每个合成 taxId 都记录在一份只追加清单中，
-使 id 在多次重建之间保持稳定（`database` 和
-`neoHGT gtdb taxdump` 在清单存在时会复用输出目录的清单，或
-`--gtdb-id-manifest` 指定的清单）。
-
-无需任何工作区设置：输出可以放在任何地方，除非
-设置了 `$NEOHGT_ROOT`，那样写入就必须留在其中。每种配置中唯一一条硬性
-规则是：只读的 GTDB 输入数据集绝不能被写入。远程序列通道
-（`--seq-source ncbi|gtdb-tar|ena`）
-在本版本中**没有下载执行器**：它们会写出
-`gtdb/fetch_plan.tsv` 供手动执行，然后拒绝继续，而不是
-悄悄构建一个空数据库。
-
-这些实用工具位于 `neoHGT gtdb <subcommand>` 之下
-（`probe, taxdump, map-report, gtdbtk, reconcile, tree-dist`），它与
-`python -m neoHGT.gtdb <subcommand>` 是同一接口；较旧的扁平形式
-`neoHGT gtdb --action probe|taxdump|map-report` 仍可解析。
-
-```sh
-# 0) read-only pre-flight: layout detection + 19 consistency checks + sha256 fingerprints
-neoHGT gtdb probe --dir /path/to/GTDB_r220 --out "$NEOHGT_CACHE/logs/layout_probe.json"
-# 0b) same checks, but write the accession-level difference lists to disk
-neoHGT gtdb reconcile --dir /path/to/GTDB_r220 --out "$NEOHGT_CACHE/reconcile" \
-  --report "$NEOHGT_CACHE/reports/reconcile.json"
-
-# 1) development tier: one representative genome per family (564 archaeal genomes, ~2.5 min)
-neoHGT database --source gtdb --gtdb-dir /path/to/GTDB_r220 \
-  --rank-sample family --gtdb-taxa d__Archaea --seq-source local \
-  --compile diamond --threads 16 -o "$NEOHGT_CACHE/db/ar_family"
-
-# 2) search (the DIAMOND db carries the GTDB taxIds, so staxids come out directly)
-diamond blastp --query sample.faa --db "$NEOHGT_CACHE/db/ar_family/diamond/db" \
-  --threads 16 --outfmt 6 qseqid sseqid pident evalue bitscore qcovhsp staxids \
-  --max-target-seqs 25 --sensitive -o hits.tsv
-neoHGT search -i sample.faa -m precomp -s hits.tsv \
-  -t "$NEOHGT_CACHE/db/ar_family/taxdump" -o "$NEOHGT_CACHE/search/sample"
-
-# 3) analyse with GTDB-flavoured ranks and donors
-neoHGT analyze -i "$NEOHGT_CACHE/search/sample/sample.tsv" \
-  -t "$NEOHGT_CACHE/db/ar_family/taxdump" -o "$NEOHGT_CACHE/analyze/sample" \
-  --self-rank genus --donor-rank genus --donor-label prefixed \
-  --donor-ncbi-map yes
-```
-
-不兼容的 CLI 缩写（argparse 前缀匹配）：新的 GTDB 选项
-与上游长选项共享前缀，因此 `database` 上的缩写
-`--a --g --ge --gen --l --rep --ty --typ --type`、`search` 上的
-`--r --re --s` 和 `analyze` 上的 `--donor-n` 变得有歧义，
-现在会报 “ambiguous option” 错误而失败。请把长选项完整写出；
-这是对既有 NCBI 脚本唯一的一处破坏性变更。
-
-关于与 NCBI 路线不同行为的说明：
-
-- 远程分类信息获取被**强制关闭**（`--fetch-enable no`），因为
-  合成 GTDB taxId 在 NCBI 中没有记录。在 GTDB 路线上，缺少
-  `staxids` 列的命中表会被大声拒绝，而不是悄悄丢弃
-  命中（`--require-staxids` 在这里默认为 yes）；在 NCBI 路线上
-  则保留上游行为。8 列的表（标准 BLAST
-  `outfmt 6`）在 GTDB 模式下会被拒绝：它的 `qstart` 列会被读作
-  一个 taxId。
-- `nodes.dmp` 以 NCBI 阶元词汇写出（`domain` 被存为
-  `superkingdom`），共 13 列，这是 `diamond makedb` 所要求的；在 CLI 上
-  `domain` 和 `superkingdom` 均可接受并自动映射。
-- 供体以官方 GTDB 标签（`g__Halorubrum`）报告，
-  `--donor-ncbi-map yes` 还会额外写出 `hgts/<sample>.donor_ncbi.tsv`，
-  离线地依据 GTDB 元数据的 `ncbi_taxid`
-  列把每个供体映射回它的 NCBI taxId。
-- `neoHGT gtdb reconcile --dir <release> --out <dir>` 对元数据、GTDB
-  分类和本地 `.faa` 索引做差分，并写出五份 accession 级差异列表
-  （`missing_faa`、`extra_faa`、`nonrep_faa`、
-  `metadata_not_in_taxonomy`、`taxonomy_not_in_metadata`），即使它们为空也照写，
-  从而留下审计痕迹，而不是只有一个通过/失败计数；任何差异都会以非零状态退出。
-  在这份 r220 副本上，全部五个列表均为空
-  （596,859 个基因组 / 113,104 个代表基因组 / 113,104 个 FASTA，24 秒，1.7 GB）。
-- `gtdb/` 下的每个派生表（以及 `lineages.txt`、reconcile 列表、
-  fetch 计划、成员扩展）都以一行溯源信息开头：
-  `# neoHGT version=…; gtdb_release=…; layout=…; generated=…`，因此任何产物
-  都能追溯到产生它的代码、发行版和时刻。
-  `taxon.map.gz` 和 `genome.map.gz` 则有意保持无注释：DIAMOND、
-  BLAST 和 `read_prot2taxid` 要原样使用它们。
-- GTDB-Tk 的输出可以用作输入分类，
-  而不必把 gtdbtk 变成依赖：`neoHGT gtdb gtdbtk --in BINs.classify.max_summary --db <db>
-  --out input_tax.tsv` 会把 GTDB-Tk 谱系（v2 的 `classification`、v1 的
-  `classify_info`、从头计算的 `gtdbtk.lineage`，或七个阶元列）
-  转换为该数据库的合成 taxId，匹配最深的已分配阶元，
-  其结果可直接送入 `neoHGT analyze --input-tax`。
-- GTDB 会在不同发行版之间更改高阶分类群的名称（`p__Proteobacteria` →
-  `p__Pseudomonadota`），而官方的 `synonyms.*.tsv` 并不包含在发行版
-  副本中，因此 `neoHGT analyze --taxon-synonyms aliases.tsv`（`alias<TAB>current`）
-  可以把你一直沿用的旧名映射到当前名称，作用于
-  `--self-tax/--close-tax/--tax-include/--tax-exclude/--input-tax`，并打印
-  哪个已弃用的名称被改写了（计划风险 RK11）。
-- `--keep-placeholder-names`（默认 `yes`，来自
-  `taxonomy.profiles.gtdb.keep_placeholder`）之所以存在，是因为有 1,658 个
-  r220 分类群使用源自 accession 的代码作为官方标签（`2-12-FULL-45-22`、`g__DUMJ01`、
-  `s__MK2026 sp010841923`）。正是出于这个原因，GTDB 配置默认关闭
-  `--tax-capital`/`--tax-latin`；如果你开启其中之一，这些代码仍会被保留，
-  除非你传入 `--keep-placeholder-names no`。
-- 在 GTDB 下，`-m precomp` 指向一个包含逐样本表的**目录**会被拒绝：
-  上游的循环给每一批都喂第一张表（其自身代码中自带的
-  `# todo: general fix`），因此后面的每个样本都会悄悄返回零命中——
-  在使用合成 GTDB taxId 时，这看起来像“没有同源序列”而不是“输入
-  文件有误”（计划附录 F6，已登记于 `docs/既有缺陷登记.md`）。
-- `--expand-members yes` 会把一份代表基因组的选择扩展为
-  它所代表的物种聚类的成员基因组（由于本地缺少 `sp_clusters.tsv`，
-  关系取自元数据列 `gtdb_genome_representative`），
-  并把完整列表写入 `gtdb/members.tsv.gz`。在这份 r220 副本上，793 个
-  Enterobacteriaceae 代表基因组会扩展出 94,393 个成员，而它们都不附带
-  蛋白文件，因此构建会带着一条可操作的提示停下来，而不是
-  悄悄交付一个更小的数据库。
-- `neoHGT gtdb tree-dist --gtdb-dir <release> --rank genus --focus g__X`
-  会依据该发行版的逐阶元树报告 patristic 距离，客观地度量有多少分类群是
-  “接近”的。古菌的属级树中，只有 1,846 个属中的 27 个落在查询属
-  的 0.5 次替换以内（细菌方面：Escherichia 为 23,111 个属中的
-  158 个）——这正是 `gtdb_archaea` 层级所需的 `closesize` 要比细菌或全量层级小得多的原因。加上 `--db <db>
-  --close-tax-out close.txt` 可以把这些标签解析为该数据库的合成
-  taxId，从而可直接传给 `neoHGT analyze --close-tax`，即一个
-  由系统发育定义的 close 组；在古菌层级上，这把预测
-  从 371（占蛋白的 9.2%）提高到 849（21.1%），
-  同时 53 个保守的 ar53 标记基因中
-  仍有 0 个被判为 HGT。
-- `--stream-extraction yes`（仅限 NCBI 路线；默认关闭，行为不变）
-  用一种基于磁盘的等价实现替换上游的蛋白提取：
-  实测每百万蛋白 882 -> 138 MB，即对 333M 个蛋白预计
-  ~287 GB -> ~45 GB，提取时间为 2.3x，每百万蛋白约 ~100 MiB
-  临时磁盘，且 `db.faa` / `genome.map.gz` / `taxon.map.gz` 逐字节相同。
-- 重新运行完全相同的命令会复用 `db.faa` 和已记录的
-  `gtdb/extraction_state.json`，因此一次中断的数小时提取
-  不会重复进行；重新生成的数据库除时间戳外与一次成功的构建
-  逐字节相同。
-- `neoHGT search` 会**追加**写入 `<output>/<sample>.tsv`（上游行为，
-  此处未改动）：向同一个 `-o` 目录运行两次会把每个蛋白写两遍，
-  而 `analyze` 会对两份副本都打分。每次运行请使用全新的 `-o`
-  目录，或者先把上一次的表移开。
-- `db.dmnd` 随 taxId 的数值*范围*增长，因此 id 基数默认为
-  `100000000`（`--gtdb-taxid-base`，最小值 `10000000`）。
-- `--source hybrid` 把 NCBI 树的顶端嫁接到 GTDB 树上，使真核和病毒分类群
-  能与 GTDB 原核生物共用一棵树：两个 GTDB 域被重新挂到 cellular root
-  （taxId 131567）之下，
-  `--hybrid-ncbi-taxdump` 指向 NCBI 的 `nodes.dmp`/`names.dmp`（必需），
-  而 `--hybrid-lca-policy root|domain|refuse` 决定两个来源都认领的蛋白
-  会如何处置。当前的 NCBI dump 把最高阶元写作
-  `cellular root`、`acellular root`、`realm` 和 `clade`，而 DIAMOND 在 `makedb` 处
-  会拒绝其中每一个，因此 `nodes.dmp` 会把词汇表之外的任何阶元折叠为 `no rank`，
-  而合并后的树、`gtdb/lineages.tsv` 和
-  `gtdb/labels.tsv` 保留真实阶元；被折叠的内容记录在
-  `meta.json` -> `taxonomy.hybrid` 以及 `gtdb/build_report.md` 的 “Hybrid graft”
-  一节中。已在真实数据上验证：合并本身
-  （`tools/verify_hybrid.py`：25 个 NCBI 节点嫁接到 146,380 个 GTDB 节点上，
-  单一根，跨来源 LCA 位于 cellular root），以及一个 6 基因组混合数据库——
-  其 DIAMOND 命中、搜索表和 `scores.tsv` 与用 `--source gtdb` 构建的相同 6 个基因组
-  逐字节一致。可搜索的序列仍然只有 GTDB 蛋白，
-  因为在本环境中下载 NCBI *蛋白*序列
-  未获授权。
-- BLAST 路线**无法**用于 GTDB id：`makeblastdb` 把本地 id 限制在
-  50 个字符以内，而 GTDB 序列 id 长达 151-270 个字符。
-  仅支持 DIAMOND。
-
-实测开销（R09-RS220，全集含 113,104 个代表基因组 / 333,384,550
-个蛋白）：
-
-| 层级 | 基因组数 | 蛋白数 | db.faa | db.dmnd | 墙钟时间 |
-| --- | --- | --- | --- | --- | --- |
-| 6 个基因组（冒烟测试；`缓存测试/db/it6` 一类的构建） | 6 | 14,373 | 6.2 MB | 614 MB | ≈1 分钟（81 秒；续跑 99 秒） |
-| 科级抽样，古菌 | 564 | 905,829 | 360 MB | 985 MB | 2 分 37 秒 |
-| 一个科，`--reps` | 793 | 3,247,172 | 1.41 GiB | 2.07 GiB | 4 分 50 秒 |
-| 属级抽样，细菌 | 23,112 | ~60-80 M | 28-37 GB | 42-110 GB | 外推 |
-| 全部代表基因组集合 | 113,104 | 333,384,550 | ~145 GiB | ~1.5-3x db.faa | ~2-3 小时提取 + 6-15 小时 makedb（外推） |
-
-实测：`db.faa` 每个蛋白占用 **466 字节**（三个层级：455 / 417 / 466），
-磁盘预检正是按此假设，并为 `makedb` 留出 3x 的峰值系数。
-
-中文文档（包括工作区约定和完整
-参数列表）位于 [`docs/GTDB-数据库.md`](docs/GTDB-数据库.md)。
-
 ## 搜索
 
-下面这种方法被认为是一种更“安全”的方式，因为你将使用 ```diamond``` 或 ```blastp``` 手动执行搜索，这可以降低因第三方库支持（例如 diamond 方面）而出现 bug 的概率。
+手动执行搜索被认为更安全，因为你将亲自运行 `diamond` 或 `blastp`。
 
 第 1/3 步：
 
-```
+```sh
 conda activate neoHGT
 ```
 
 第 2/3 步：
 
-（下面为了清晰起见，命令被拆分成多行，但在实际操作中你应该保持为一行，不要按 ```return``` 键）
-
-```
-diamond blastp
---query <input_file.faa>
---db <diamond_db>
---outfmt 6 qseqid sseqid pident evalue bitscore qcovhsp staxids
-> <output_directory>/result.txt
+```sh
+diamond blastp --query <input_file.faa> --db <diamond_db> --outfmt 6 qseqid sseqid pident evalue bitscore qcovhsp staxids > <output_directory>/result.txt
 ```
 
 第 3/3 步：
 
-```
-neoHGT search -i <input_file.faa>
--m precomp -s <output_directory>/result.txt
--t <taxdump_dir>
--o <output_directory>
+```sh
+neoHGT search -i <input_file.faa> -m precomp -s <output_directory>/result.txt -t <taxdump_dir> -o <output_directory>
 ```
 
-查看你的 ```<output_directory>``` 中的 ```.tsv``` 文件，如果它非空，就可以继续进行 [分析](#分析) 步骤。
+查看 `<output_directory>` 中的 `.tsv` 文件；如果非空，继续[分析](#分析)。
 
 ___
 
-如果由于某些原因 ```diamond``` 无法工作，备选方案是 ```blastp```，可在[这里](https://blast.ncbi.nlm.nih.gov/doc/blast-help/downloadblastdata.html)找到。但首先，你需要按照这篇[文章](https://www.ncbi.nlm.nih.gov/books/NBK569841/)来编译 blastp 数据库。
+如果 `diamond` 无法工作，备选方案是 `blastp`，可在[这里](https://blast.ncbi.nlm.nih.gov/doc/blast-help/downloadblastdata.html)找到。请按照[这篇文章](https://www.ncbi.nlm.nih.gov/books/NBK569841/)编译 BLAST 数据库。
 
-构建 blast 数据库的命令大致如下：
-
-```
-makeblastdb -parse_seqids -in db.faa
--out <blast_db_path>/<name_of_db>
--title <name_of_db>
--taxid_map <taxon.map>
+```sh
+makeblastdb -parse_seqids -in db.faa -out <blast_db_path>/<name_of_db> -title <name_of_db> -taxid_map <taxon.map>
 ```
 
-这里的 taxon.map 文件可以通过运行以下命令获得：
+`taxon.map` 文件可以通过以下命令获得：
 
-```
+```sh
 gunzip -k taxon.map.gz
 ```
 
-然后，输入以下命令：
+然后运行：
 
-```
-blastp -query <input_file.faa>
--db <blast_db_path>/<name_of_db>
--outfmt "6 qaccver saccver pident evalue bitscore qcovhsp staxids"
-> <output_directory>/result_blast.txt
+```sh
+blastp -query <input_file.faa> -db <blast_db_path>/<name_of_db> -outfmt "6 qaccver saccver pident evalue bitscore qcovhsp staxids" > <output_directory>/result_blast.txt
 ```
 
-最后，
+最后：
 
-```
-neoHGT search -i <input_file.faa>
--m precomp -s <output_directory>/result_blast.txt
--t <taxdump_dir>
--o <output_directory>
+```sh
+neoHGT search -i <input_file.faa> -m precomp -s <output_directory>/result_blast.txt -t <taxdump_dir> -o <output_directory>
 ```
 
-查看你的 ```<output_directory>``` 中的 ```.tsv``` 文件，如果它非空，就可以继续进行 [分析](#分析) 步骤。
+查看 `<output_directory>` 中的 `.tsv` 文件；如果非空，继续[分析](#分析)。
 
 ___
 
-除了手动方式之外，下面这条命令会把搜索过程一站式完成，但不推荐使用，因为由于 ```diamond``` 的依赖版本升级，一个已知的兼容性 bug 已被发现并得到证实：
+一站式搜索不推荐使用，因为 DIAMOND 依赖升级存在已知兼容性问题：
 
-```
+```sh
 neoHGT search -i <input_file.faa.gz> -o . -m diamond -p 32 -d <diamond_db> -t <taxdump_dir>
 ```
 
-要了解更多细节，请参阅 [HGTector 的 issue 页面](https://github.com/qiyunlab/HGTector/issues/114)。
+详情见 [HGTector 的 issue 页面](https://github.com/qiyunlab/HGTector/issues/114)。
 
 ## 分析
 
-遵循上游 neoHGT，图形的输出格式是 `.pdf` 而非 `.png`，以获得更高的分辨率并便于发表。
+遵循上游 neoHGT，图形输出格式为 `.pdf` 而非 `.png`，以获得更高分辨率并便于发表。
 
-分析所得 ```.tsv``` 文件的命令是：
-
-```
-neoHGT analyze -i <output.tsv>
--t <taxdump_dir>
--o <output_dir>
+```sh
+neoHGT analyze -i <output.tsv> -t <taxdump_dir> -o <output_dir>
 ```
 
-它会生成若干文件，其中最重要的是 ```scatter.pdf```，它是整条流水线的主要输出。
+这会生成若干文件，其中最重要的是 `scatter.pdf`，它是整条流水线的主要输出。
 
 ___
 
-出于研究发表的严谨性考虑，你可能希望完全掌控诸如 ```--self-tax``` 和 ```--close-tax``` 这样的变量，否则程序会自动推断这些值。
+出于研究发表的严谨性，你可能希望完全掌控 `--self-tax` 和 `--close-tax`；否则程序会自动推断。
 
+```sh
+neoHGT analyze -i <output.tsv> -t <taxdump_dir> -o <output_dir> --self-tax <NCBI Taxonomy ID> --close-tax <NCBI Taxonomy ID>
 ```
-neoHGT analyze -i <output.tsv>
--t <taxdump_dir>
--o <output_dir>
---self-tax <NCBI Taxonomy ID>
---close-tax <NCBI Taxonomy ID>
-```
+
 ___
 
-上面为了清晰起见，命令被拆分成多行，但在实际操作中你应该保持为一行，不要按 ```return``` 键。
+## 文档
 
+用户文档提供中英两版：
+
+| 文档 | 语言 | 内容 |
+| --- | --- | --- |
+| [README.md](README.md) | 英文 | 本页：安装、GTDB 快速开始、NCBI 路线 |
+| [README.zh-CN.md](README.zh-CN.md) | 中文 | 本页的中文镜像 |
+| [docs/GTDB-数据库.md](docs/GTDB-数据库.md) | 中文 | 完整的 GTDB 指南 |
+| [docs/en/GTDB-database.md](docs/en/GTDB-database.md) | 英文 | 完整的 GTDB 指南 |
+| [docs/README.md](docs/README.md) | 英文 | 文档索引 |
+| [docs/cli-reference.md](docs/cli-reference.md) | 英文 | 完整 CLI 选项参考 |
+| [docs/config-reference.md](docs/config-reference.md) | 英文 | `config.yml` 参考 |
+| [docs/troubleshooting.md](docs/troubleshooting.md) | 英文 | 常见问题与处理 |
+| [CHANGELOG.md](CHANGELOG.md) | 英文 | 版本说明 |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | 英文 | 开发、测试与文档维护 |
+| [CITATION.cff](CITATION.cff) | — | 机器可读的引用元数据 |
+
+`docs/` 下的三个 JSON 文件（[`新增函数清单.json`](docs/新增函数清单.json)、[`方案编号清单.json`](docs/方案编号清单.json)、[`路由等价性清单.json`](docs/路由等价性清单.json)）是面向维护者的机器清单，保留中文文件名，没有英文版本；用途、字段和再生成命令见 [docs/README.md](docs/README.md)。
 
 ## 卸载
 
-要卸载，你可以运行：
-```
+要卸载：
+
+```sh
 conda remove -n neoHGT --all
 ```
 
-注意：`bioconda` 是一个 conda *通道*，而不是一个包，因此没有什么可在那里卸载的；如果你还想移除 DIAMOND，可以像上面那样删除整个环境，或者运行 `conda remove -n neoHGT diamond`。
-
+注意：`bioconda` 是 conda *通道*，不是包。要单独移除 DIAMOND，可运行 `conda remove -n neoHGT diamond`，或像上面那样删除整个环境。
 
 ## 发表文献
 
@@ -532,16 +420,13 @@ conda remove -n neoHGT --all
 
 > Filée, J., Becker, H. F., Mellottee, L., Eddine, R. Z., Li, Z., Yin, W., Lambry, J.-C., Liebl, U., & Myllykallio, H. (2023, February 15). Bacterial origins of thymidylate metabolism in Asgard Archaea and Eukarya. Nature Communications. Retrieved February 18, 2023, from https://www.nature.com/articles/s41467-023-36487-z
 
-
-
 ## 文献引用
 
 > Zhu Q, Kosoy M, Dittmar K. HGTector: [an automated method facilitating genome-wide discovery of putative horizontal gene transfers](https://bmcgenomics.biomedcentral.com/articles/10.1186/1471-2164-15-717). *BMC Genomics*. 2014. 15:717.
 
-
 ## 许可证
 
-本仓库——非官方的 neoHGT2GTDB 适配——及其各上游项目均以 [BSD 3-clause](http://opensource.org/licenses/BSD-3-Clause) 许可证分发；参见完整的[声明](LICENSE)，其中载有每一条上游版权声明。
+本仓库——非官方的 neoHGT2GTDB 适配——及其各上游项目均以 [BSD 3-clause](https://opensource.org/licenses/BSD-3-Clause) 许可证分发；参见完整的[声明](LICENSE)，其中载有每一条上游版权声明。
 
 Copyright (c) 2026-, 曾子超 (Zeng Zichao, [ORCID 0000-0001-6553-970X](https://orcid.org/0000-0001-6553-970X)) 以及 neoHGT2GTDB 的各位贡献者。
 

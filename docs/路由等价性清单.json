@@ -1,5 +1,7 @@
 {
- "generated_from": "neoHGT2GTDB-项目代码",
+ "generated_by": "tools/verify_plan_traceability.py --emit-route",
+ "generated_from": "neoHGT2GTDB",
+ "generated_utc": "2026-11-06 07:15:57",
  "keys": {
   "analyze.coverage": {
    "attr": "coverage",
@@ -272,6 +274,8 @@
    "modules": [
     "search"
    ],
+   "neutralizer": "coerce_fetch_counts() in search.py",
+   "reason": "the CLI and configuration routes hand over different Python types; the named neutralizer converts them before use",
    "yaml_type": "int"
   },
   "fetch.retries": {
@@ -283,6 +287,8 @@
    "modules": [
     "search"
    ],
+   "neutralizer": "coerce_fetch_counts() in search.py",
+   "reason": "the CLI and configuration routes hand over different Python types; the named neutralizer converts them before use",
    "yaml_type": "int"
   },
   "fetch.timeout": {
@@ -451,6 +457,8 @@
    "modules": [
     "analyze"
    ],
+   "neutralizer": "arg2bool() over (weighted, orphans, self_low, donor_name), analyze.py set_parameters",
+   "reason": "the CLI and configuration routes hand over different Python types; the named neutralizer converts them before use",
    "yaml_type": "bool"
   },
   "predict.outliers": {
@@ -473,6 +481,8 @@
    "modules": [
     "analyze"
    ],
+   "neutralizer": "arg2bool() over (weighted, orphans, self_low, donor_name), analyze.py set_parameters",
+   "reason": "the CLI and configuration routes hand over different Python types; the named neutralizer converts them before use",
    "yaml_type": "bool"
   },
   "predict.silhouette": {
@@ -495,6 +505,8 @@
    "modules": [
     "analyze"
    ],
+   "neutralizer": "arg2bool() over (weighted, orphans, self_low, donor_name), analyze.py set_parameters",
+   "reason": "the CLI and configuration routes hand over different Python types; the named neutralizer converts them before use",
    "yaml_type": "bool"
   },
   "program.blastdbcmd": {
@@ -765,6 +777,8 @@
     "database",
     "search"
    ],
+   "neutralizer": "arg2bool() over (tax_unique, tax_capital, tax_latin), search.py args_wf",
+   "reason": "the CLI and configuration routes hand over different Python types; the named neutralizer converts them before use",
    "yaml_type": "bool"
   },
   "taxonomy.exclude": {
@@ -799,6 +813,8 @@
     "database",
     "search"
    ],
+   "neutralizer": "arg2bool() over (tax_unique, tax_capital, tax_latin), search.py args_wf",
+   "reason": "the CLI and configuration routes hand over different Python types; the named neutralizer converts them before use",
    "yaml_type": "bool"
   },
   "taxonomy.unique": {
@@ -810,6 +826,8 @@
    "modules": [
     "search"
    ],
+   "neutralizer": "arg2bool() over (tax_unique, tax_capital, tax_latin), search.py args_wf",
+   "reason": "the CLI and configuration routes hand over different Python types; the named neutralizer converts them before use",
    "yaml_type": "bool"
   },
   "taxonomy.unirank": {
@@ -824,6 +842,7 @@
    "yaml_type": "NoneType"
   }
  },
- "note": "one record per config key the stage modules read; a key whose two routes hand over different objects needs a converter or a named neutralizer (register rule 19)",
+ "note": "one record per config key the stage modules read; a key whose two routes hand over different objects needs a converter or a named neutralizer",
+ "schema_version": 1,
  "unresolved_call_sites": []
 }

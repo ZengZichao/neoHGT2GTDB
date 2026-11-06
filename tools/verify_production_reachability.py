@@ -4,7 +4,7 @@
 Execution coverage answers "did any test call this?", which is not the question
 a user cares about. `HybridProvider.resolve_shared_protein` was called by tests,
 printed its setting into the build report, and was never invoked by any build
-path (round 30). This tool answers the product-level question:
+path. This tool answers the product-level question:
 
   1. take the functions this adaptation *added* (diffed against the pristine
      upstream tree, so upstream's own dead code is nobody's problem here);
@@ -406,7 +406,11 @@ def main():
     ap.add_argument('--code', default='.', help='adapted package root')
     ap.add_argument('--baseline', default=None,
                     help='pristine upstream tree (default: $NEOHGT_MAIN)')
-    ap.add_argument('--deliverables', default=None)
+    ap.add_argument('--deliverables', default=None,
+                    help='workspace-side deliverables ledger (optional)')
+    ap.add_argument('--public-declared', default=None,
+                    help='public JSON list of functions kept as library API '
+                         'but deliberately unreachable from the CLI')
     ap.add_argument('--out', default=None)
     ap.add_argument('--control', action='store_true',
                     help='also run the negative control (slower)')
@@ -449,15 +453,26 @@ def main():
     # skipped with an explicit note instead of failing the audit
     qc_absent = not isfile(deliverables_doc)
     declared = declared_exceptions(deliverables_doc)
+    public_path = (args.public_declared
+                   or join(code, 'docs', 'reachability-exceptions.json'))
+    public_declared = set()
+    if isfile(public_path):
+        with open(public_path, encoding='utf-8') as fh:
+            public_declared = set(json.load(fh).get('functions') or [])
+        declared |= public_declared
     unjudged = {rel: [n for n in names if n not in declared
                       and n.split('.')[-1] not in declared]
                 for rel, names in unreachable.items()}
     unjudged = {k: v for k, v in unjudged.items() if v}
-    if qc_absent:
+    if qc_absent and not public_declared:
         unjudged = {}
         print('  NOTE: the internal QC registers are not part of this checkout '
               '(public release) -- the declared-exception cross-check was '
               'skipped; it runs strictly inside the project workspace')
+    elif qc_absent:
+        print(f'  NOTE: {len(public_declared)} public exception(s) loaded from '
+              f'{public_path}; the workspace-side QC ledger is not in this '
+              'checkout')
     untracked = (untracked_names(defs, frozen, frozen_up)
                  if frozen and frozen_up else {})
     drift = None
