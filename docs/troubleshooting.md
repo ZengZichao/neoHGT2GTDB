@@ -156,6 +156,6 @@ Use `--stream-extraction yes` on the NCBI route. It keeps peak memory nearly con
 ## Getting more detail
 
 - `neoHGT <sub-command> --help` lists all options.
-- `neoHGT gtdb probe` records the dataset layout, self-check results and input fingerprints.
+- `neoHGT gtdb probe` records the dataset layout, the self-check results and the read-only status of the input dataset. Input fingerprints (sha256) are produced later, by `neoHGT database --input-fingerprints yes`, which writes `gtdb/input_fingerprints.tsv`.
 - `neoHGT gtdb reconcile` records every accession-level mismatch.
 - `meta.json` in a built library records the release, layout, counts, DIAMOND version, selection and self-check results.

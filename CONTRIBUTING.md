@@ -91,7 +91,7 @@ Update a manifest whenever the corresponding code or plan changes. A stale manif
 - User guides describe what the software does and how to use it. They do not record development rounds, debugging sessions or internal task IDs.
 - Commands must be copy-pasteable. Define every environment variable before its first use, or use explicit paths.
 - English and Chinese versions of the GTDB guide keep the same section structure and the same numbers.
-- `docs/cli-reference.md` and `docs/config-reference.md` are generated from the shipped code and configuration; update the generator or the source table rather than editing the output by hand when possible.
+- `docs/cli-reference.md` and `docs/config-reference.md` are maintained by hand against the shipped code and configuration; update them in the same change whenever an option, a value or a default changes. The traceability gate rejects a documented option that the parser does not accept.
 - Relative links must resolve inside the repository. Run `python tools/verify_docs.py .` before opening a pull request.
 - External links (NCBI, OneDrive, Dropbox, conda pages) are not checked by CI; run `curl -I` on the URLs in the README and the GTDB guide before a release and replace dead links.
 

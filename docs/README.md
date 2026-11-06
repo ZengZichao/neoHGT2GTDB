@@ -17,7 +17,7 @@ This directory contains the user manuals and the machine-readable maintenance ma
 | [`../CONTRIBUTING.md`](../CONTRIBUTING.md) | English | Contributors | Development setup, tests, documentation gates and manifest maintenance |
 | [`../CITATION.cff`](../CITATION.cff) | — | All users | Machine-readable citation metadata |
 
-The GTDB guide and the README are the primary sources for users. The CLI and configuration references are generated from the shipped code and configuration; see their headers for regeneration commands.
+The GTDB guide and the README are the primary sources for users. The CLI and configuration references are maintained by hand against the shipped code and configuration; the traceability gate (`tools/verify_plan_traceability.py`) checks their documented options, option values and default promises.
 
 ## Machine-readable manifests
 

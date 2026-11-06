@@ -1,6 +1,6 @@
 # Command-line reference
 
-`neoHGT` has four sub-commands: `database`, `search`, `analyze`, and `gtdb`. This page lists every option accepted by each sub-command. The option names and help texts are generated from the shipped `arguments` tables; when this page and `neoHGT <sub-command> --help` disagree, the code is authoritative.
+`neoHGT` has four sub-commands: `database`, `search`, `analyze`, and `gtdb`. This page lists every option accepted by each sub-command. The page is maintained by hand against the shipped `arguments` tables and is checked against them by the traceability gate (`tools/verify_plan_traceability.py`); when this page and `neoHGT <sub-command> --help` disagree, the code is authoritative.
 
 Run `neoHGT <sub-command> --help` for the same information in a terminal.
 
@@ -230,7 +230,7 @@ Run `neoHGT <sub-command> --help` for the same information in a terminal.
 | --- | --- | --- |
 | `--gtdb-dir` | — | GTDB release root; uses the trees under `tree_*/` |
 | `--tree` | — | A specific Newick tree file |
-| `--rank` | — | Rank tree to use with `--gtdb-dir`: `phylum`, `class`, `order`, `family`, `genus` |
+| `--rank` | genus | Rank tree to use with `--gtdb-dir`: `phylum`, `class`, `order`, `family`, `genus` |
 | `--focus` | — | Label of the focal taxon, e.g. `g__Halorubrum` |
 | `--max-distance` | — | Maximum patristic distance to report |
 | `--top-k` | — | Report the top K closest taxa |

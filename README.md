@@ -147,7 +147,7 @@ argparse prefix matching means that new long options can make an old abbreviatio
 | `search` | `--r`/`--re`, `--s` | `--retries`, `--server` |
 | `analyze` | `--t`/`--ta`/`--tax`, `--donor-n` | `--taxdump`, `--donor-name` |
 
-`--h`, `--k` and `--w` are also newly ambiguous but had no previous long-option meaning. `--g`/`--ge`/`--gen` were already ambiguous upstream between `--genbank` and `--genoids`; they are not caused by this adaptation.
+In the `database` sub-command, `--h`, `--k` and `--w` are also newly ambiguous (`--k` is ambiguous in `search` too), but they had no previous long-option meaning. `--g`/`--ge`/`--gen` were already ambiguous upstream between `--genbank` and `--genoids`; they are not caused by this adaptation.
 
 ### Measured budgets
 

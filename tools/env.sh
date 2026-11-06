@@ -18,8 +18,8 @@ if [ -z "${NEOHGT_ROOT:-}" ]; then
 fi
 export NEOHGT_ROOT
 
-export NEOHGT_TMP="${NEOHGT_TMP:-$NEOHGT_ROOT/neoHGT2GTDB-临时文件}"
-export NEOHGT_CACHE="${NEOHGT_CACHE:-$NEOHGT_ROOT/neoHGT2GTDB-缓存测试}"
+export NEOHGT_TMP="${NEOHGT_TMP:-$NEOHGT_ROOT/tmp}"
+export NEOHGT_CACHE="${NEOHGT_CACHE:-$NEOHGT_ROOT/cache}"
 
 # Read-only GTDB release. Put the assignment in tools/env.local as well if you
 # do not want to export it in every shell.
